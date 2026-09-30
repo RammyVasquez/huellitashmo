@@ -4,6 +4,9 @@ import { Fredoka, Nunito } from "next/font/google";
 import SiteNav from "@/components/SiteNav";
 import "./globals.css";
 
+// Ninguna consulta a la base de datos se guarda en caché en todo el sitio
+export const fetchCache = "force-no-store";
+
 const display = Fredoka({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display" });
 const body = Nunito({ subsets: ["latin"], variable: "--font-body" });
 
