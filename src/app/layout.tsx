@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Fredoka, Nunito } from "next/font/google";
+import SiteNav from "@/components/SiteNav";
 import "./globals.css";
 
 const display = Fredoka({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-display" });
@@ -13,6 +14,12 @@ export const metadata: Metadata = {
     "Adopta, apadrina y dona en especie a los refugios de Hermosillo. Reporta mascotas perdidas o encontradas.",
   openGraph: { siteName: "Huellitas HMO", locale: "es_MX", type: "website" },
   twitter: { card: "summary_large_image" },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#13284f",
 };
 
 function Paw() {
@@ -34,14 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <header className="site">
           <div className="wrap">
             <Link href="/" className="brand"><Paw /> Huellitas HMO</Link>
-            <nav aria-label="Principal">
-              <Link href="/animales">Adopta</Link>
-              <Link href="/animales?apadrinar=1">Apadrina</Link>
-              <Link href="/donar">Dona</Link>
-              <Link href="/refugios">Refugios</Link>
-              <Link href="/adopta">Cómo adoptar</Link>
-              <Link href="/reportes">Perdidos y encontrados</Link>
-            </nav>
+            <SiteNav />
           </div>
         </header>
         <main>{children}</main>
@@ -52,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               No pedimos dinero: los donativos son en especie y se entregan directo al refugio.
               ¿Perdiste o encontraste una mascota? <Link href="/reportes/nuevo">Haz un reporte</Link>.
             </p>
+            <p className="footer-admin"><Link href="/admin">Acceso para administradores</Link></p>
           </div>
         </footer>
       </body>

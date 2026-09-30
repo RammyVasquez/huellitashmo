@@ -31,32 +31,58 @@ function directionsUrl(s: Shelter) {
   return null;
 }
 
+const ORDEN_MSG = "Ordenados del más cercano al más lejano, en línea recta.";
+
 export default function DonarExplorer({ shelters, needs }: { shelters: Shelter[]; needs: ShelterNeed[] }) {
   const [user, setUser] = useState<Pos | null>(null);
   const [estado, setEstado] = useState<"idle" | "buscando" | "listo" | "error">("idle");
   const [msg, setMsg] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [picking, setPicking] = useState(false);
 
   function locate() {
+    setPicking(false);
     if (!("geolocation" in navigator)) {
       setEstado("error");
-      setMsg("Tu navegador no permite obtener la ubicación.");
+      setMsg("Tu navegador no permite obtener la ubicación. Toca el mapa para marcar dónde estás.");
+      setPicking(true);
       return;
     }
     setEstado("buscando");
-    setMsg("Buscando tu ubicación…");
+    setMsg("Buscando tu ubicación… si tu navegador te pregunta, elige “Permitir”.");
     navigator.geolocation.getCurrentPosition(
       (p) => {
         setUser({ lat: p.coords.latitude, lng: p.coords.longitude });
         setEstado("listo");
-        setMsg("Ordenados del más cercano al más lejano, en línea recta.");
+        setMsg(ORDEN_MSG);
       },
-      () => {
+      (err) => {
         setEstado("error");
-        setMsg("No pudimos obtener tu ubicación. Revisa el permiso del navegador o elige un refugio en el mapa.");
+        setPicking(true);
+        setMsg(
+          err.code === 1
+            ? "Tu navegador tiene bloqueado el permiso de ubicación para este sitio. Puedes activarlo (abajo te decimos cómo) o tocar el mapa para marcar dónde estás."
+            : err.code === 3
+            ? "Tardó demasiado en encontrarte. Intenta de nuevo o toca el mapa para marcar dónde estás."
+            : "No pudimos determinar tu ubicación. Revisa que la ubicación del teléfono esté activada o toca el mapa para marcar dónde estás."
+        );
       },
-      { timeout: 10000 }
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 }
     );
+  }
+
+  function marcarEnMapa() {
+    setPicking(true);
+    setEstado("idle");
+    setMsg("Toca el mapa en el lugar donde estás.");
+    document.querySelector(".map-box")?.scrollIntoView({ block: "center" });
+  }
+
+  function onPick(p: Pos) {
+    setUser(p);
+    setEstado("listo");
+    setPicking(false);
+    setMsg(`Ubicación marcada en el mapa. ${ORDEN_MSG}`);
   }
 
   const withCoords = useMemo(
@@ -89,13 +115,25 @@ export default function DonarExplorer({ shelters, needs }: { shelters: Shelter[]
         <button className="btn" onClick={locate} disabled={estado === "buscando"}>
           {estado === "listo" ? "Actualizar mi ubicación" : "Ver el refugio más cercano a mí"}
         </button>
-        <p className="muted" role="status" aria-live="polite" style={{ margin: 0 }}>
+        <button className="btn ghost" onClick={marcarEnMapa}>Marcar mi ubicación en el mapa</button>
+        <p className="muted" role="status" aria-live="polite" style={{ margin: 0, flexBasis: "100%" }}>
           {msg || "Tu ubicación se usa solo en tu navegador para calcular distancias: no se guarda ni se envía."}
         </p>
       </div>
 
+      {estado === "error" && (
+        <details className="help box">
+          <summary>¿Cómo activo la ubicación?</summary>
+          <ul>
+            <li><b>iPhone:</b> Ajustes → Privacidad y seguridad → Localización → activa “Localización” y en Safari (Sitios web) elige “Al usar la app”. Luego, en Safari, toca “aA” junto a la dirección → Ajustes del sitio web → Ubicación → “Preguntar” o “Permitir”.</li>
+            <li><b>Android (Chrome):</b> toca el ícono junto a la dirección → Permisos → Ubicación → “Permitir”.</li>
+            <li>Si abriste esta liga desde Facebook, Instagram o WhatsApp, ábrela en Safari o Chrome: los navegadores dentro de esas apps suelen bloquear la ubicación.</li>
+          </ul>
+        </details>
+      )}
+
       {withCoords.length > 0 ? (
-        <ShelterMap shelters={withCoords} user={user} selectedId={selected} onSelect={pick} />
+        <ShelterMap shelters={withCoords} user={user} selectedId={selected} onSelect={pick} onPick={picking ? onPick : undefined} picking={picking} />
       ) : (
         <div className="empty">Los refugios aún no tienen ubicación en el mapa.</div>
       )}
@@ -148,6 +186,7 @@ export default function DonarExplorer({ shelters, needs }: { shelters: Shelter[]
               <div className="actions">
                 {wa && <a className="btn alt" href={wa}>Coordinar mi donativo</a>}
                 {dir && <a className="btn ghost" href={dir} target="_blank" rel="noopener noreferrer">Cómo llegar</a>}
+                <a className="btn ghost" href={`/refugios/${s.id}`}>Ver perfil</a>
                 {s.lat != null && <button className="btn ghost" onClick={() => { setSelected(s.id); document.querySelector(".map-box")?.scrollIntoView({ block: "center" }); }}>Ver en el mapa</button>}
               </div>
             </article>

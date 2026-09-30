@@ -9,24 +9,28 @@ type Props = {
   user: Point | null;
   selectedId: string | null;
   onSelect: (id: string) => void;
+  onPick?: (p: Point) => void;   // si existe, tocar el mapa marca la ubicación de la persona
+  picking?: boolean;
 };
 
 const HERMOSILLO: [number, number] = [29.0729, -110.9559];
 const pin = (active: boolean) =>
   L.divIcon({ className: "", html: `<div class="pin${active ? " active" : ""}"></div>`, iconSize: [30, 30], iconAnchor: [15, 30] });
 
-export default function ShelterMap({ shelters, user, selectedId, onSelect }: Props) {
+export default function ShelterMap({ shelters, user, selectedId, onSelect, onPick, picking }: Props) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const markers = useRef<Map<string, L.Marker>>(new Map());
   const userMarker = useRef<L.CircleMarker | null>(null);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
+  const onPickRef = useRef(onPick);
+  onPickRef.current = onPick;
 
   // Crear el mapa una sola vez
   useEffect(() => {
     if (!el.current) return;
-    const m = L.map(el.current, { scrollWheelZoom: false }).setView(HERMOSILLO, 12);
+    const m = L.map(el.current, { scrollWheelZoom: false, dragging: !L.Browser.mobile }).setView(HERMOSILLO, 12);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -39,6 +43,17 @@ export default function ShelterMap({ shelters, user, selectedId, onSelect }: Pro
       userMarker.current = null;
     };
   }, []);
+
+  // Tocar el mapa para marcar dónde estás
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    const h = (e: L.LeafletMouseEvent) => onPickRef.current?.({ lat: e.latlng.lat, lng: e.latlng.lng });
+    m.on("click", h);
+    return () => { m.off("click", h); };
+  }, []);
+
+  useEffect(() => { el.current?.classList.toggle("picking", !!picking); }, [picking]);
 
   // Marcadores de refugios
   useEffect(() => {

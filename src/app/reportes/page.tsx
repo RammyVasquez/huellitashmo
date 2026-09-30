@@ -20,7 +20,7 @@ export default async function Reportes({ searchParams }: { searchParams: { tipo?
       {reports.length === 0 ? (
         <div className="empty">No hay reportes activos. Si viste o perdiste una mascota, cuéntanos.</div>
       ) : (
-        <div className="grid">
+        <div className="grid reportes">
           {reports.map((r) => (
             <div key={r.id} className="card">
               {r.photo_url ? <img src={r.photo_url} alt={`Mascota ${r.kind}`} /> : <div className="ph" />}
