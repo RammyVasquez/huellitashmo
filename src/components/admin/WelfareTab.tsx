@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errTexto, fechaCorta } from "@/lib/util";
-import { CATEGORIAS, type AdminWelfare, type HelpContact } from "@/lib/types";
+import { CATEGORIAS, type AdminWelfare, type HelpContact, type WelfareCategory } from "@/lib/types";
 
 const ESTADOS = ["pendiente", "activo", "en_atencion", "resuelto", "cerrado"] as const;
 type Estado = (typeof ESTADOS)[number];
@@ -30,14 +30,26 @@ export default function WelfareTab() {
     const { data } = await supabase.auth.getSession();
     const res = await fetch("/api/notificar-prueba", { method: "POST", headers: { Authorization: `Bearer ${data.session?.access_token ?? ""}` } });
     if (!res.ok) { setAviso("No se pudo probar (¿sesión vencida?)."); return; }
-    const r = (await res.json()) as { telegram: string; correo: string };
-    setAviso(`Telegram: ${r.telegram} · Correo: ${r.correo}`);
+    const r = (await res.json()) as { telegram: string; correo: string; detalle?: string };
+    setAviso(`Telegram: ${r.telegram} · Correo: ${r.correo}${r.detalle ? ` — ${r.detalle}` : ""}`);
   }
 
   async function cambiar(id: string, status: Estado) {
     setMsg("");
     const { error } = await supabase.from("welfare_reports").update({ status, resolved_at: status === "resuelto" ? new Date().toISOString() : null }).eq("id", id);
     if (error) setMsg(`No se pudo actualizar: ${errTexto(error)}`); else load();
+  }
+
+  async function cambiarTipo(r: AdminWelfare, categoria: WelfareCategory) {
+    const seHaceVisible = CATEGORIAS[categoria].publica && !CATEGORIAS[r.category].publica && (r.status === "activo" || r.status === "en_atencion");
+    if (seHaceVisible && !confirm("Este caso se mostrará públicamente en la página de Rescate (sin teléfono y con ubicación aproximada). ¿Continuar?")) return;
+    const { error } = await supabase.from("welfare_reports").update({ category: categoria }).eq("id", r.id);
+    if (error) setMsg(`No se pudo cambiar el tipo: ${errTexto(error)}`); else load();
+  }
+
+  async function cambiarEspecie(id: string, especie: AdminWelfare["species"]) {
+    const { error } = await supabase.from("welfare_reports").update({ species: especie }).eq("id", id);
+    if (error) setMsg(`No se pudo cambiar la especie: ${errTexto(error)}`); else load();
   }
 
   async function guardarNota(id: string, notas: string) {
@@ -114,6 +126,20 @@ export default function WelfareTab() {
                 ? <a href={`https://wa.me/${r.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de quien reportó</a>
                 : <span className="muted">Reporte anónimo</span>}
               {r.allow_contact && <span className="tag ok" style={{ marginLeft: ".5rem" }}>acepta que le escriban</span>}
+            </div>
+            <div className="two" style={{ marginTop: ".6rem" }}>
+              <label>Tipo (corrígelo si se eligió mal)
+                <select value={r.category} onChange={(e) => cambiarTipo(r, e.target.value as WelfareCategory)}>
+                  {(Object.keys(CATEGORIAS) as WelfareCategory[]).map((c) => (
+                    <option key={c} value={c}>{CATEGORIAS[c].titulo}{CATEGORIAS[c].publica ? "" : " (no se publica)"}</option>
+                  ))}
+                </select>
+              </label>
+              <label>Especie
+                <select value={r.species} onChange={(e) => cambiarEspecie(r.id, e.target.value as AdminWelfare["species"])}>
+                  <option value="perro">Perro</option><option value="gato">Gato</option><option value="otro">Otro</option>
+                </select>
+              </label>
             </div>
             <label style={{ marginTop: ".6rem" }}>Notas internas (no son públicas)
               <textarea rows={2} defaultValue={r.admin_notes ?? ""} onBlur={(e) => guardarNota(r.id, e.target.value)} />
