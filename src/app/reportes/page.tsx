@@ -1,43 +1,25 @@
-import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import ReportsExplorer from "@/components/ReportsExplorer";
 import type { PublicReport } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+export const metadata = { title: "Perdidos y encontrados · Huellitas HMO" };
 
-export default async function Reportes({ searchParams }: { searchParams: { tipo?: string } }) {
-  let q = supabase.from("reports_public").select("*").eq("status", "activo").order("created_at", { ascending: false });
-  if (searchParams.tipo === "perdido" || searchParams.tipo === "encontrado") q = q.eq("kind", searchParams.tipo);
-  const { data } = await q;
+export default async function Reportes() {
+  const { data } = await supabase
+    .from("reports_public")
+    .select("*")
+    .eq("status", "activo")
+    .order("created_at", { ascending: false });
   const reports = (data ?? []) as PublicReport[];
 
   return (
-    <>
-      <h1>Perdidos y encontrados</h1>
-      <p>
-        <Link href="/reportes">Todos</Link> · <Link href="/reportes?tipo=perdido">Perdidos</Link> ·{" "}
-        <Link href="/reportes?tipo=encontrado">Encontrados</Link>
+    <div className="wrap page">
+      <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Perdidos y encontrados</h1>
+      <p className="lead">
+        Mira en el mapa dónde se perdió o se encontró una mascota. Si reconoces a alguna, escribe a quien la reportó.
       </p>
-      {reports.length === 0 ? (
-        <div className="empty">No hay reportes activos. Si viste o perdiste una mascota, cuéntanos.</div>
-      ) : (
-        <div className="grid reportes">
-          {reports.map((r) => (
-            <div key={r.id} className="card">
-              {r.photo_url ? <img src={r.photo_url} alt={`Mascota ${r.kind}`} /> : <div className="ph" />}
-              <div className="body">
-                <span className={`tag ${r.kind}`}>{r.kind}</span>
-                <span className="tag">{r.species}</span>
-                <p>{r.description}</p>
-                <small>{r.zone}</small>
-                <p>
-                  {/* El teléfono nunca llega al navegador: la ruta /api/contacto redirige a WhatsApp */}
-                  <a className="btn" href={`/api/contacto/${r.id}`}>Contactar por WhatsApp</a>
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </>
+      <ReportsExplorer reports={reports} />
+    </div>
   );
 }

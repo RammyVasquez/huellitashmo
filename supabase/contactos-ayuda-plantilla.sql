@@ -1,0 +1,6 @@
+-- Plantilla para tus contactos de ayuda. NO la corras tal cual: sustituye por datos que TÚ verificaste
+-- (llamando o en el sitio oficial). También puedes agregarlos desde /admin > Rescates.
+-- insert into help_contacts (name, phone, note, sort) values
+--   ('NOMBRE DE LA CLÍNICA VETERINARIA 24 HORAS', '662 000 0000', 'Urgencias, también de noche', 1),
+--   ('NOMBRE DEL REFUGIO ALIADO',                  '662 000 0000', 'Rescate y canalización',      2),
+--   ('NOMBRE DE LA AUTORIDAD MUNICIPAL / CONTROL ANIMAL', '662 000 0000', 'Reportes de maltrato', 3);

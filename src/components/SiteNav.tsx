@@ -8,7 +8,7 @@ const LINKS: [string, string][] = [
   ["/animales?apadrinar=1", "Apadrina"],
   ["/donar", "Dona"],
   ["/refugios", "Refugios"],
-  ["/adopta", "Cómo adoptar"],
+  ["/rescate", "Rescate"],
   ["/reportes", "Perdidos y encontrados"],
 ];
 

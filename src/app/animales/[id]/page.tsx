@@ -6,6 +6,10 @@ import { getAnimal, getShelter } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
+const EDAD = { cachorro: "Cachorro", joven: "Joven", adulto: "Adulto", senior: "Senior" } as const;
+const TAMANO = { pequeno: "Pequeño", mediano: "Mediano", grande: "Grande" } as const;
+const ENERGIA = { tranquilo: "Tranquilo", moderado: "Energía moderada", activo: "Muy activo" } as const;
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const a = await getAnimal(params.id);
   if (!a) return { title: "Animal no encontrado · Huellitas HMO" };
@@ -45,6 +49,17 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
             {a.status === "en_proceso" && <span className="tag urgente">adopción en proceso</span>}
             {a.status === "adoptado" && <span className="tag ok">¡ya encontró hogar!</span>}
           </p>
+          {(a.age_group || a.size || a.energy || a.good_kids || a.good_pets) && (
+            <p>
+              {a.age_group && <span className="tag">{EDAD[a.age_group]}</span>}
+              {a.size && <span className="tag">{TAMANO[a.size]}</span>}
+              {a.energy && <span className="tag">{ENERGIA[a.energy]}</span>}
+              {a.good_kids === "si" && <span className="tag ok">se lleva bien con niños</span>}
+              {a.good_kids === "no" && <span className="tag perdido">mejor sin niños</span>}
+              {a.good_pets === "si" && <span className="tag ok">se lleva bien con otros animales</span>}
+              {a.good_pets === "no" && <span className="tag perdido">mejor sin otros animales</span>}
+            </p>
+          )}
           {a.description && <p className="lead">{a.description}</p>}
 
           {a.status !== "adoptado" && (

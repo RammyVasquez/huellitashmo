@@ -55,6 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               No pedimos dinero: los donativos son en especie y se entregan directo al refugio.
               ¿Perdiste o encontraste una mascota? <Link href="/reportes/nuevo">Haz un reporte</Link>.
             </p>
+            <p>
+              <Link href="/adopta">Cómo adoptar</Link> · <Link href="/match">Encuentra tu match</Link> · <Link href="/rescate">Animales heridos o maltratados</Link>
+            </p>
             <p className="footer-admin"><Link href="/admin">Acceso para administradores</Link></p>
           </div>
         </footer>

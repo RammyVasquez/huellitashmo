@@ -12,7 +12,7 @@ export default async function Home() {
   ]);
   const s = (st ?? {
     reportes: 0, reunificaciones: 0, animales_registrados: 0,
-    adopciones: 0, esterilizados: 0, padrinos: 0,
+    adopciones: 0, esterilizados: 0, padrinos: 0, auxiliados: 0,
   }) as ImpactStats;
   const animals = (an ?? []) as Animal[];
   const featured = animals.find((a) => a.photo_url) ?? null;
@@ -24,6 +24,7 @@ export default async function Home() {
     [s.esterilizados, "esterilizados"],
     [s.padrinos, "padrinos"],
     [s.reunificaciones, "familias reunidas"],
+    [s.auxiliados ?? 0, "animales auxiliados"],
   ];
 
   return (
@@ -37,7 +38,7 @@ export default async function Home() {
           </p>
           <div className="actions">
             <Link className="btn" href="/animales">Conoce a quién espera</Link>
-            <Link className="btn ghost" href="/adopta">Cómo adoptar</Link>
+            <Link className="btn ghost" href="/match">Encuentra tu match</Link>
           </div>
         </div>
         {featured ? (
@@ -101,6 +102,17 @@ export default async function Home() {
             <li><div><h3>Llévalo a casa</h3><p>Firmas un compromiso de cuidado y el refugio te acompaña después.</p></div></li>
           </ol>
           <p style={{ marginTop: "1.2rem" }}><Link className="btn alt" href="/adopta">Ver requisitos y preguntas frecuentes</Link></p>
+        </section>
+
+        <section className="section">
+          <div className="band alerta">
+            <h2>¿Viste un animal herido, enfermo o maltratado?</h2>
+            <p>Avísanos. Revisamos cada reporte y lo canalizamos con quien pueda ayudar. Puedes reportar sin dejar tus datos.</p>
+            <div className="actions">
+              <Link className="btn" href="/rescate/nuevo">Reportar un animal en riesgo</Link>
+              <Link className="btn ghost" href="/rescate">Ver casos que necesitan ayuda</Link>
+            </div>
+          </div>
         </section>
 
         <section className="section">

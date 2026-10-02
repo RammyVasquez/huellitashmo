@@ -6,9 +6,11 @@ import ReportsTab from "./ReportsTab";
 import AnimalsTab from "./AnimalsTab";
 import NeedsTab from "./NeedsTab";
 import SheltersTab from "./SheltersTab";
+import WelfareTab from "./WelfareTab";
 
 const TABS = [
   ["reportes", "Reportes"],
+  ["rescates", "Rescates"],
   ["animales", "Animales"],
   ["necesidades", "Necesidades"],
   ["refugios", "Refugios"],
@@ -48,6 +50,7 @@ export default function AdminApp() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [esAdmin, setEsAdmin] = useState<boolean | null>(null);
   const [tab, setTab] = useState<Tab>("reportes");
+  const [pend, setPend] = useState({ reportes: 0, rescates: 0, urgentes: 0 });
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSession(data.session));
@@ -59,6 +62,19 @@ export default function AdminApp() {
     if (!session) { setEsAdmin(null); return; }
     supabase.rpc("is_admin").then(({ data }) => setEsAdmin(data === true));
   }, [session]);
+
+  useEffect(() => {
+    if (!esAdmin) return;
+    (async () => {
+      const cuenta = (tabla: string, urgente?: boolean) => {
+        let q = supabase.from(tabla).select("id", { count: "exact", head: true }).eq("status", "pendiente");
+        if (urgente) q = q.eq("urgent", true);
+        return q;
+      };
+      const [a, b, c] = await Promise.all([cuenta("reports"), cuenta("welfare_reports"), cuenta("welfare_reports", true)]);
+      setPend({ reportes: a.count ?? 0, rescates: b.count ?? 0, urgentes: c.count ?? 0 });
+    })();
+  }, [esAdmin, tab]);
 
   if (session === undefined) return <p className="muted">Cargando…</p>;
   if (!session) return <Login />;
@@ -80,10 +96,15 @@ export default function AdminApp() {
       </div>
       <div className="tabs" role="tablist">
         {TABS.map(([id, label]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>{label}</button>
+          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
+            {label}
+            {id === "reportes" && pend.reportes > 0 && ` (${pend.reportes})`}
+            {id === "rescates" && pend.rescates > 0 && ` (${pend.rescates})${pend.urgentes > 0 ? " ¡urgente!" : ""}`}
+          </button>
         ))}
       </div>
       {tab === "reportes" && <ReportsTab />}
+      {tab === "rescates" && <WelfareTab />}
       {tab === "animales" && <AnimalsTab />}
       {tab === "necesidades" && <NeedsTab />}
       {tab === "refugios" && <SheltersTab />}

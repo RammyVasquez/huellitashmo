@@ -37,6 +37,11 @@ export default function AnimalsTab() {
         age_text: String(fd.get("age_text")).trim() || null,
         description: String(fd.get("description")).trim() || null,
         photo_url,
+        age_group: String(fd.get("age_group")) || null,
+        size: String(fd.get("size")) || null,
+        energy: String(fd.get("energy")) || null,
+        good_kids: String(fd.get("good_kids")) || null,
+        good_pets: String(fd.get("good_pets")) || null,
         status,
         sterilized: fd.get("sterilized") === "on",
         vaccinated: fd.get("vaccinated") === "on",
@@ -91,6 +96,36 @@ export default function AnimalsTab() {
           </label>
         </div>
         <label>Edad (ej. “2 años”, “cachorro”)<input name="age_text" defaultValue={editing?.age_text ?? ""} /></label>
+        <p className="muted" style={{ margin: 0 }}>Su carácter ayuda a recomendarlo a la familia correcta. Si no lo sabes, déjalo en “Sin dato”.</p>
+        <div className="two">
+          <label>Grupo de edad
+            <select name="age_group" defaultValue={editing?.age_group ?? ""}>
+              <option value="">Sin dato</option><option value="cachorro">Cachorro (menos de 1 año)</option><option value="joven">Joven (1 a 3 años)</option><option value="adulto">Adulto (3 a 8 años)</option><option value="senior">Senior (más de 8 años)</option>
+            </select>
+          </label>
+          <label>Tamaño
+            <select name="size" defaultValue={editing?.size ?? ""}>
+              <option value="">Sin dato</option><option value="pequeno">Pequeño</option><option value="mediano">Mediano</option><option value="grande">Grande</option>
+            </select>
+          </label>
+        </div>
+        <label>Nivel de energía
+          <select name="energy" defaultValue={editing?.energy ?? ""}>
+            <option value="">Sin dato</option><option value="tranquilo">Tranquilo</option><option value="moderado">Moderado</option><option value="activo">Muy activo</option>
+          </select>
+        </label>
+        <div className="two">
+          <label>¿Se lleva bien con niños?
+            <select name="good_kids" defaultValue={editing?.good_kids ?? ""}>
+              <option value="">Sin dato</option><option value="si">Sí</option><option value="no">No / mejor sin niños</option>
+            </select>
+          </label>
+          <label>¿Se lleva bien con otros animales?
+            <select name="good_pets" defaultValue={editing?.good_pets ?? ""}>
+              <option value="">Sin dato</option><option value="si">Sí</option><option value="no">No / mejor solo</option>
+            </select>
+          </label>
+        </div>
         <label>Su historia y carácter<textarea name="description" rows={4} defaultValue={editing?.description ?? ""} /></label>
         <label>Foto {editing?.photo_url && <span className="muted">(ya tiene; sube otra para reemplazarla)</span>}
           <input name="foto" type="file" accept="image/*" />

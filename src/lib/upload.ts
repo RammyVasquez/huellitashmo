@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 // Reduce la foto antes de subirla (fotos de celular de 4-8 MB -> ~200 KB) para cuidar el espacio gratuito.
-async function shrink(file: File, maxSide: number, mime: "image/jpeg" | "image/png") {
+export async function comprimirImagen(file: File, maxSide: number, mime: "image/jpeg" | "image/png") {
   let bmp: ImageBitmap;
   try {
     bmp = await createImageBitmap(file);
@@ -18,10 +18,10 @@ async function shrink(file: File, maxSide: number, mime: "image/jpeg" | "image/p
   );
 }
 
-export async function uploadPhoto(file: File, folder: "animales" | "logos"): Promise<string> {
+export async function uploadPhoto(file: File, folder: "animales" | "logos" | "reportes"): Promise<string> {
   const isLogo = folder === "logos"; // los logos conservan transparencia (PNG)
   const mime = isLogo ? "image/png" : "image/jpeg";
-  const blob = await shrink(file, isLogo ? 512 : 1400, mime);
+  const blob = await comprimirImagen(file, isLogo ? 512 : 1400, mime);
   const path = `${folder}/${crypto.randomUUID()}.${isLogo ? "png" : "jpg"}`;
   const { error } = await supabase.storage.from("fotos").upload(path, blob, { contentType: mime });
   if (error) throw error;

@@ -28,6 +28,12 @@ export default async function Animales({
           ? "Apadrinar es comprometerte a cubrir algo de su cuidado en especie, como su comida del mes o su vacuna. El refugio te dirá qué necesita y cómo entregarlo."
           : "Animales de refugios de Hermosillo que hoy buscan hogar. Si alguno te llama la atención, escríbele al refugio desde su ficha."}
       </p>
+      {!apadrinar && (
+        <p className="band" style={{ padding: "1rem 1.3rem" }}>
+          <b>¿No sabes a cuál elegir?</b> Responde 5 preguntas y te sugerimos a quién conocer primero.{" "}
+          <Link href="/match">Encuentra tu match</Link>
+        </p>
+      )}
       <div className="chips">
         <Link href={apadrinar ? "/animales?apadrinar=1" : "/animales"} aria-current={!especie}>Todos</Link>
         <Link href={`${base}especie=perro`} aria-current={especie === "perro"}>Perros</Link>

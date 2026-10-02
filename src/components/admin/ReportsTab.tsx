@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { errTexto, fechaCorta } from "@/lib/util";
+import MatchPanel from "./MatchPanel";
 import type { AdminReport } from "@/lib/types";
 
 const ESTADOS = ["pendiente", "activo", "reunificado", "cerrado"] as const;
@@ -11,9 +12,10 @@ export default function ReportsTab() {
   const [items, setItems] = useState<AdminReport[]>([]);
   const [filtro, setFiltro] = useState<Estado>("pendiente");
   const [msg, setMsg] = useState("");
+  const [abierto, setAbierto] = useState<string | null>(null);
 
   async function load() {
-    const { data, error } = await supabase.from("reports").select("*").order("created_at", { ascending: false }).limit(300);
+    const { data, error } = await supabase.from("reports").select("id, kind, species, description, photo_url, photos, zone, lat, lng, contact_whatsapp, status, created_at").order("created_at", { ascending: false }).limit(300);
     if (error) setMsg(`No se pudieron cargar: ${errTexto(error)}`);
     setItems((data ?? []) as AdminReport[]);
   }
@@ -51,19 +53,36 @@ export default function ReportsTab() {
       {msg && <p className="error" role="alert">{msg}</p>}
       {lista.length === 0 && <div className="empty">No hay reportes en “{filtro}”.</div>}
       {lista.map((r) => (
-        <div className="admin-row" key={r.id}>
-          {r.photo_url ? <img className="thumb" src={r.photo_url} alt="" /> : <div className="thumb" />}
+        <div key={r.id}>
+        <div className="admin-row">
+          <div className="thumbs">
+            {(r.photos?.length ? r.photos : r.photo_url ? [r.photo_url] : []).slice(0, 5).map((u) => (
+              <a key={u} href={u} target="_blank" rel="noopener noreferrer"><img className="thumb" src={u} alt="Foto del reporte" /></a>
+            ))}
+            {!r.photos?.length && !r.photo_url && <div className="thumb" />}
+          </div>
           <div className="grow">
             <span className={`tag ${r.kind}`}>{r.kind}</span><span className="tag">{r.species}</span>
             <span className="muted"> {r.zone} · {fechaCorta(r.created_at)}</span>
             <p style={{ margin: ".3rem 0" }}>{r.description}</p>
             <a href={`https://wa.me/${r.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de quien reportó</a>
+            {" · "}
+            {r.lat != null && r.lng != null
+              ? <a href={`https://www.google.com/maps?q=${r.lat},${r.lng}`} target="_blank" rel="noopener noreferrer">Ver ubicación exacta</a>
+              : <span className="muted">Sin ubicación en el mapa</span>}
           </div>
           <div className="row-actions">
             {acciones[r.status].map(([label, dest, primary]) => (
               <button key={label} className={`btn ${primary ? "alt" : "ghost"}`} onClick={() => cambiar(r.id, dest)}>{label}</button>
             ))}
+            {(r.status === "pendiente" || r.status === "activo") && (
+              <button className="btn ghost" aria-expanded={abierto === r.id} onClick={() => setAbierto(abierto === r.id ? null : r.id)}>
+                {abierto === r.id ? "Ocultar coincidencias" : "Buscar coincidencias"}
+              </button>
+            )}
           </div>
+        </div>
+        {abierto === r.id && <MatchPanel report={r} todos={items} onDone={() => { setAbierto(null); load(); }} />}
         </div>
       ))}
     </>

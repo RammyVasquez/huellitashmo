@@ -15,6 +15,11 @@ export type Animal = {
   sponsorable: boolean;
   sponsors: number;
   created_at: string;
+  size: "pequeno" | "mediano" | "grande" | null;
+  energy: "tranquilo" | "moderado" | "activo" | null;
+  age_group: "cachorro" | "joven" | "adulto" | "senior" | null;
+  good_kids: "si" | "no" | null;
+  good_pets: "si" | "no" | null;
 };
 
 export type Shelter = {
@@ -51,6 +56,7 @@ export type PublicReport = {
   zone: string | null;
   status: "activo" | "reunificado";
   created_at: string;
+  photos: string[] | null;
 };
 
 export type ImpactStats = {
@@ -60,6 +66,7 @@ export type ImpactStats = {
   adopciones: number;
   esterilizados: number;
   padrinos: number;
+  auxiliados?: number;
 };
 
 export type AdminReport = {
@@ -69,7 +76,54 @@ export type AdminReport = {
   description: string;
   photo_url: string | null;
   zone: string | null;
+  lat: number | null;
+  lng: number | null;
   contact_whatsapp: string;
   status: "pendiente" | "activo" | "reunificado" | "cerrado";
   created_at: string;
+  photos: string[] | null;
+};
+
+export type WelfareCategory = "atropellado_herido" | "enfermo" | "maltrato" | "abandono_encierro" | "otro";
+
+export type WelfarePublic = {
+  id: string;
+  category: "atropellado_herido" | "enfermo";
+  species: Species;
+  urgent: boolean;
+  description: string;
+  photos: string[] | null;
+  zone: string;
+  lat: number | null;
+  lng: number | null;
+  status: "activo" | "en_atencion";
+  created_at: string;
+  allow_contact: boolean;
+};
+
+export type AdminWelfare = {
+  id: string;
+  category: WelfareCategory;
+  species: Species;
+  urgent: boolean;
+  description: string;
+  photos: string[] | null;
+  zone: string;
+  lat: number | null;
+  lng: number | null;
+  contact_whatsapp: string | null;
+  allow_contact: boolean;
+  status: "pendiente" | "activo" | "en_atencion" | "resuelto" | "cerrado";
+  admin_notes: string | null;
+  created_at: string;
+};
+
+export type HelpContact = { id: string; name: string; phone: string; note: string | null; sort: number };
+
+export const CATEGORIAS: Record<WelfareCategory, { titulo: string; texto: string; publica: boolean }> = {
+  atropellado_herido: { titulo: "Atropellado o herido", texto: "Necesita atención médica", publica: true },
+  enfermo: { titulo: "Enfermo o desnutrido", texto: "Se ve mal de salud o muy flaco", publica: true },
+  maltrato: { titulo: "Maltrato o crueldad", texto: "Golpes, abuso o violencia", publica: false },
+  abandono_encierro: { titulo: "Abandono o encierro", texto: "Encadenado, sin agua ni sombra", publica: false },
+  otro: { titulo: "Otra situación de riesgo", texto: "Atrapado, en peligro u otra", publica: false },
 };
