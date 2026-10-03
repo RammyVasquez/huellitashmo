@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Pos } from "@/lib/geo";
@@ -9,13 +9,15 @@ const icon = L.divIcon({ className: "", html: '<div class="pin"></div>', iconSiz
 
 export type Focus = { lat: number; lng: number; zoom: number; n: number };
 
-export default function LocationPicker({ value, onChange, focus }: { value: Pos | null; onChange: (p: Pos | null) => void; focus?: Focus | null }) {
+export default function LocationPicker({ value, onChange, focus, accuracy }: {
+  value: Pos | null; onChange: (p: Pos | null) => void; focus?: Focus | null; accuracy?: number | null;
+}) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const marker = useRef<L.Marker | null>(null);
+  const circle = useRef<L.Circle | null>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
-  const [aviso, setAviso] = useState("");
 
   useEffect(() => {
     if (!el.current) return;
@@ -26,7 +28,7 @@ export default function LocationPicker({ value, onChange, focus }: { value: Pos 
     }).addTo(m);
     m.on("click", (e: L.LeafletMouseEvent) => onChangeRef.current({ lat: e.latlng.lat, lng: e.latlng.lng }));
     map.current = m;
-    return () => { m.remove(); map.current = null; marker.current = null; };
+    return () => { m.remove(); map.current = null; marker.current = null; circle.current = null; };
   }, []);
 
   // El marcador siempre refleja el valor del formulario
@@ -45,34 +47,27 @@ export default function LocationPicker({ value, onChange, focus }: { value: Pos 
     }
   }, [value]);
 
-  // Mover el mapa cuando se busca una colonia
+  // Círculo con la precisión del GPS
+  useEffect(() => {
+    const m = map.current;
+    if (!m) return;
+    circle.current?.remove();
+    circle.current = null;
+    if (value && accuracy && accuracy > 15) {
+      circle.current = L.circle([value.lat, value.lng], { radius: accuracy, color: "#1d3a73", weight: 1, fillOpacity: 0.1, interactive: false }).addTo(m);
+    }
+  }, [value, accuracy]);
+
   useEffect(() => {
     if (focus) map.current?.setView([focus.lat, focus.lng], focus.zoom);
   }, [focus]);
 
-  function usarMiUbicacion() {
-    setAviso("");
-    if (!("geolocation" in navigator)) { setAviso("Tu navegador no permite obtener la ubicación. Toca el mapa para marcarla."); return; }
-    navigator.geolocation.getCurrentPosition(
-      (p) => {
-        const pos = { lat: p.coords.latitude, lng: p.coords.longitude };
-        onChange(pos);
-        map.current?.setView([pos.lat, pos.lng], 16);
-      },
-      () => setAviso("No pudimos obtener tu ubicación. Toca el mapa para marcarla."),
-      { timeout: 15000 }
-    );
-  }
-
   return (
     <div>
-      <div className="actions" style={{ margin: "0 0 .6rem" }}>
-        <button type="button" className="btn ghost" onClick={usarMiUbicacion}>Usar mi ubicación actual</button>
-        {value && <button type="button" className="btn ghost" onClick={() => onChange(null)}>Quitar ubicación</button>}
-      </div>
       <div ref={el} className="map-box small" role="region" aria-label="Mapa para marcar la ubicación" />
       <p className="muted" role="status" style={{ margin: ".5rem 0 0", fontSize: ".92rem" }}>
-        {aviso || (value ? "Ubicación marcada. Puedes arrastrar el pin para ajustarla." : "Toca el mapa donde la viste o donde se perdió.")}
+        {value ? "Ubicación marcada. Arrastra el pin o toca el mapa para ajustarla." : "Toca el mapa para marcar el lugar."}
+        {value && <> <button type="button" className="link" onClick={() => onChange(null)}>Quitar ubicación</button></>}
       </p>
     </div>
   );
