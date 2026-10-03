@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { enComun } from "@/lib/buscar";
 import { cargarModelo, similitud, vectorDeFoto } from "@/lib/clip";
 import { km, fmtKm } from "@/lib/geo";
 import { errTexto, fechaCorta } from "@/lib/util";
@@ -10,7 +11,8 @@ type Vectores = number[][];
 type Candidato = { r: AdminReport; sim: number };
 
 const fotosDe = (r: AdminReport) => (r.photos?.length ? r.photos : r.photo_url ? [r.photo_url] : []).slice(0, 5);
-const nivel = (s: number) => (s >= 0.9 ? "Muy parecido" : s >= 0.82 ? "Parecido" : "Algo parecido");
+// Umbrales provisionales: en una prueba, un perro y un gato distintos dieron 0.73
+const nivel = (s: number) => (s >= 0.9 ? "Muy parecido" : s >= 0.83 ? "Parecido" : s >= 0.76 ? "Algo parecido" : "Poco parecido");
 
 export default function MatchPanel({ report, todos, onDone }: { report: AdminReport; todos: AdminReport[]; onDone: () => void }) {
   const [fase, setFase] = useState<"idle" | "trabajando" | "listo" | "error">("idle");
@@ -107,7 +109,10 @@ export default function MatchPanel({ report, todos, onDone }: { report: AdminRep
               <span className={`tag ${c.kind}`}>{c.kind}</span>
               <span className="muted"> {c.zone} · {fechaCorta(c.created_at)}{dist != null && ` · a ${fmtKm(dist)} de este reporte`}</span>
               <p style={{ margin: ".3rem 0" }}>{c.description}</p>
-              <small className="muted">Similitud visual: {sim.toFixed(2)}</small>
+              <small className="muted">
+                Similitud visual: {sim.toFixed(2)}
+                {enComun(report.description, c.description).length > 0 && ` · En común en la descripción: ${enComun(report.description, c.description).join(", ")}`}
+              </small>
               <div>
                 <a href={`https://wa.me/${report.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de este reporte</a>{" · "}
                 <a href={`https://wa.me/${c.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp del candidato</a>

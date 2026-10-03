@@ -2,6 +2,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { coincide } from "@/lib/buscar";
 import { fmtKm, km } from "@/lib/geo";
 import { useLocation } from "@/lib/useLocation";
 import { fechaCorta } from "@/lib/util";
@@ -21,11 +22,15 @@ export default function ReportsExplorer({ reports }: { reports: PublicReport[] }
   const [tipo, setTipo] = useState<Tipo>("todos");
   const [especie, setEspecie] = useState<Especie>("todas");
   const [selected, setSelected] = useState<string | null>(null);
+  const [q, setQ] = useState("");
   const loc = useLocation("Ordenados del más cercano al más lejano.");
 
   const filtrados = useMemo(
-    () => reports.filter((r) => (tipo === "todos" || r.kind === tipo) && (especie === "todas" || r.species === especie)),
-    [reports, tipo, especie]
+    () => reports.filter((r) =>
+      (tipo === "todos" || r.kind === tipo) &&
+      (especie === "todas" || r.species === especie) &&
+      coincide(q, `${r.kind} ${r.species} ${r.zone ?? ""} ${r.description}`)),
+    [reports, tipo, especie, q]
   );
 
   const { lista, dist } = useMemo(() => {
@@ -55,6 +60,9 @@ export default function ReportsExplorer({ reports }: { reports: PublicReport[] }
 
   return (
     <>
+      <label className="buscador">Buscar por descripción, color, colonia o seña
+        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ej. café con collar rojo, Portales, “Simón”" />
+      </label>
       <div className="chips" role="group" aria-label="Filtrar por tipo">
         <Chip activo={tipo === "todos"} onClick={() => setTipo("todos")}>Todos</Chip>
         <Chip activo={tipo === "perdido"} onClick={() => setTipo("perdido")}>Perdidos</Chip>
@@ -87,6 +95,13 @@ export default function ReportsExplorer({ reports }: { reports: PublicReport[] }
         </>
       ) : (
         <div className="empty">Ningún reporte con ubicación en el mapa por ahora.</div>
+      )}
+
+      {(q.trim() || tipo !== "todos" || especie !== "todas") && (
+        <p className="muted" role="status" style={{ margin: "1rem 0 0" }}>
+          Mostrando {lista.length} de {reports.length} reportes.{" "}
+          {q.trim() && <button type="button" className="link" onClick={() => setQ("")}>Limpiar búsqueda</button>}
+        </p>
       )}
 
       {lista.length === 0 ? (

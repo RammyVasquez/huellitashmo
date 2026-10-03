@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { coincide } from "@/lib/buscar";
 import { errTexto, fechaCorta } from "@/lib/util";
 import MatchPanel from "./MatchPanel";
 import type { AdminReport } from "@/lib/types";
@@ -13,6 +14,7 @@ export default function ReportsTab() {
   const [filtro, setFiltro] = useState<Estado>("pendiente");
   const [msg, setMsg] = useState("");
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [busqueda, setBusqueda] = useState("");
 
   async function load() {
     const { data, error } = await supabase.from("reports").select("id, kind, species, description, photo_url, photos, zone, lat, lng, contact_whatsapp, status, created_at").order("created_at", { ascending: false }).limit(300);
@@ -31,7 +33,7 @@ export default function ReportsTab() {
     else load();
   }
 
-  const lista = items.filter((r) => r.status === filtro);
+  const lista = items.filter((r) => r.status === filtro && coincide(busqueda, `${r.kind} ${r.species} ${r.zone ?? ""} ${r.description}`));
   const cuenta = (e: Estado) => items.filter((r) => r.status === e).length;
 
   const acciones: Record<Estado, [string, Estado, boolean][]> = {
@@ -43,6 +45,9 @@ export default function ReportsTab() {
 
   return (
     <>
+      <label className="buscador">Buscar en los reportes
+        <input type="search" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} placeholder="Ej. gris collar rosa, Portales" />
+      </label>
       <div className="chips">
         {ESTADOS.map((e) => (
           <a key={e} href="#" aria-current={filtro === e} onClick={(ev) => { ev.preventDefault(); setFiltro(e); }}>
