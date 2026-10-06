@@ -391,15 +391,17 @@ ul.contactos { list-style: none; margin: 0; padding: 0; display: grid; gap: .6re
 .cartel-banda.perdido { background: #b8382b; }
 .cartel-banda.encontrado { background: #13284f; font-size: 10.5cqw; padding: 4.5cqw 2cqw; }
 .cartel-sub { text-align: center; font-family: var(--font-display), sans-serif; font-weight: 600; font-size: 5.2cqw; padding: 2cqw 5cqw 1.5cqw; }
-.cartel-fotos { margin: 0 5cqw; height: 50cqw; display: grid; gap: 1.5cqw; grid-template-columns: 1fr; grid-template-rows: 1fr; }
-.cartel-fotos.varias { grid-template-columns: 2fr 1fr; grid-template-rows: 1fr 1fr; }
-.cartel-fotos img, .cartel-fotos .sin-foto { width: 100%; height: 100%; object-fit: cover; border-radius: 2cqw; background: #eef3fb; display: grid; place-items: center; color: #51607c; }
+.cartel-fotos { margin: 0 5cqw; height: 46cqw; flex: none; display: grid; gap: 1.5cqw; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.cartel-fotos.varias { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); }
 .cartel-fotos.varias .principal { grid-row: 1 / span 2; }
+.cartel-fotos .foto { position: relative; overflow: hidden; min-width: 0; min-height: 0; border-radius: 2cqw; background: #eef3fb; }
+.cartel-fotos .foto img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.cartel-fotos .sin-foto { position: absolute; inset: 0; display: grid; place-items: center; color: #51607c; }
 .cartel-desc { margin: 2.5cqw 5cqw 0; font-size: 3.5cqw; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
 .cartel-nota { margin: 1cqw 5cqw 0; font-size: 3.6cqw; font-weight: 700; color: #b8382b; }
 .cartel-zona { margin: 1.5cqw 5cqw 0; font-size: 3.8cqw; }
 .cartel-pie { margin: auto 5cqw 0; display: flex; gap: 3cqw; align-items: center; padding-top: 2cqw; }
-.cartel-pie .qr { width: 25cqw; flex: none; }
+.cartel-pie .qr { width: 23cqw; flex: none; }
 .cartel-pie .qr svg { width: 100%; height: auto; display: block; }
 .cartel-contacto { font-size: 3.4cqw; line-height: 1.3; display: grid; gap: 1cqw; }
 .cartel-contacto .liga { font-weight: 700; font-size: 3.4cqw; word-break: break-all; }

@@ -44,9 +44,11 @@ export default function CartelEditor({ tipo, especie, zona, descripcion, fotos, 
           {perdido ? (nombre ? `${especie} · Se llama ${nombre}` : especie) : `Se encontró un ${especie.toLowerCase()}`}
         </div>
         <div className={`cartel-fotos${fotos.length > 1 ? " varias" : ""}`}>
-          {fotos[0] ? <img src={fotos[0]} alt="Foto principal" className="principal" /> : <div className="principal sin-foto">Sin foto</div>}
-          {fotos[1] && <img src={fotos[1]} alt="Foto 2" className="extra e1" />}
-          {fotos[2] && <img src={fotos[2]} alt="Foto 3" className="extra e2" />}
+          <div className="foto principal">
+            {fotos[0] ? <img src={fotos[0]} alt="Foto principal" /> : <span className="sin-foto">Sin foto</span>}
+          </div>
+          {fotos[1] && <div className="foto"><img src={fotos[1]} alt="Foto 2" /></div>}
+          {fotos[2] && <div className="foto"><img src={fotos[2]} alt="Foto 3" /></div>}
         </div>
         <p className="cartel-desc">{descripcion}</p>
         {nota && <p className="cartel-nota">{nota}</p>}
