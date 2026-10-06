@@ -14,7 +14,7 @@ const GRUPOS: Record<Grupo, { nombre: string; estados: EstadoSolicitud[] }> = {
   cerradas: { nombre: "Cerradas", estados: ["rechazada", "cancelada"] },
 };
 
-export default function AdoptionsTab() {
+export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
   const { shelters } = useShelters();
   const [items, setItems] = useState<AdoptionRequest[]>([]);
   const [seguimientos, setSeguimientos] = useState<Followup[]>([]);
@@ -150,10 +150,14 @@ export default function AdoptionsTab() {
               </details>
               <div style={{ marginTop: ".4rem" }}>
                 <a href={`https://wa.me/${r.whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de la persona</a>
-                {" · "}
-                {sh?.whatsapp
-                  ? <a href={`https://wa.me/${sh.whatsapp}?text=${encodeURIComponent(resumenParaRefugio(r))}`} target="_blank" rel="noopener noreferrer">Enviar resumen al refugio</a>
-                  : <span className="muted">El refugio no tiene WhatsApp registrado</span>}
+                {rol !== "refugio" && (
+                  <>
+                    {" · "}
+                    {sh?.whatsapp
+                      ? <a href={`https://wa.me/${sh.whatsapp}?text=${encodeURIComponent(resumenParaRefugio(r))}`} target="_blank" rel="noopener noreferrer">Enviar resumen al refugio</a>
+                      : <span className="muted">El refugio no tiene WhatsApp registrado</span>}
+                  </>
+                )}
               </div>
               <label style={{ marginTop: ".6rem" }}>Notas internas
                 <textarea rows={2} defaultValue={r.admin_notes ?? ""} onBlur={(e) => guardarNota(r.id, e.target.value)} />

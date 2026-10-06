@@ -5,9 +5,9 @@ import { errTexto } from "@/lib/util";
 import { useShelters } from "./useShelters";
 import type { ShelterNeed } from "@/lib/types";
 
-export default function NeedsTab() {
+export default function NeedsTab({ shelterId: fijo }: { shelterId?: string } = {}) {
   const { shelters, cargando } = useShelters();
-  const [shelterId, setShelterId] = useState("");
+  const [shelterId, setShelterId] = useState(fijo ?? "");
   const [needs, setNeeds] = useState<ShelterNeed[]>([]);
   const [formKey, setFormKey] = useState(0);
   const [msg, setMsg] = useState("");
@@ -51,11 +51,13 @@ export default function NeedsTab() {
 
   return (
     <>
-      <label style={{ maxWidth: 540 }}>Refugio
-        <select value={shelterId} onChange={(e) => setShelterId(e.target.value)}>
-          {shelters.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-        </select>
-      </label>
+      {!fijo && (
+        <label style={{ maxWidth: 540 }}>Refugio
+          <select value={shelterId} onChange={(e) => setShelterId(e.target.value)}>
+            {shelters.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+          </select>
+        </label>
+      )}
 
       <h2 style={{ marginTop: "1.6rem" }}>Agregar necesidad</h2>
       <form className="stack" key={formKey} onSubmit={agregar}>

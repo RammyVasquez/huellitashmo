@@ -6,8 +6,9 @@ import { errTexto } from "@/lib/util";
 import { useShelters } from "./useShelters";
 import type { Animal } from "@/lib/types";
 
-export default function AnimalsTab() {
+export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
   const { shelters, cargando } = useShelters();
+  const visibles = shelterId ? shelters.filter((s) => s.id === shelterId) : shelters;
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [editing, setEditing] = useState<Animal | null>(null);
   const [formKey, setFormKey] = useState(0);
@@ -15,7 +16,9 @@ export default function AnimalsTab() {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
   async function load() {
-    const { data } = await supabase.from("animals").select("*").order("created_at", { ascending: false });
+    let q = supabase.from("animals").select("*").order("created_at", { ascending: false });
+    if (shelterId) q = q.eq("shelter_id", shelterId);
+    const { data } = await q;
     setAnimals((data ?? []) as Animal[]);
   }
   useEffect(() => { load(); }, []);
@@ -70,18 +73,20 @@ export default function AnimalsTab() {
     else load();
   }
 
-  if (!cargando && shelters.length === 0)
+  if (!cargando && visibles.length === 0)
     return <div className="empty">Primero registra un refugio en la pestaña “Refugios”.</div>;
 
   return (
     <>
       <h2>{editing ? `Editar a ${editing.name}` : "Registrar animal"}</h2>
       <form className="stack" key={`${formKey}-${shelters.length}`} onSubmit={onSubmit}>
-        <label>Refugio
-          <select name="shelter_id" defaultValue={editing?.shelter_id ?? shelters[0]?.id} required>
-            {shelters.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
-          </select>
-        </label>
+        {shelterId ? <input type="hidden" name="shelter_id" value={shelterId} /> : (
+          <label>Refugio
+            <select name="shelter_id" defaultValue={editing?.shelter_id ?? visibles[0]?.id} required>
+              {visibles.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </label>
+        )}
         <label>Nombre<input name="name" defaultValue={editing?.name ?? ""} required /></label>
         <div className="two">
           <label>Especie

@@ -9,17 +9,23 @@ import SheltersTab from "./SheltersTab";
 import WelfareTab from "./WelfareTab";
 import AdoptionsTab from "./AdoptionsTab";
 import BackupTab, { CLAVE_RESPALDO } from "./BackupTab";
+import TeamTab, { ROL_NOMBRE } from "./TeamTab";
+import AccountTab from "./AccountTab";
 
-const TABS = [
-  ["reportes", "Reportes"],
-  ["rescates", "Rescates"],
-  ["adopciones", "Adopciones"],
-  ["animales", "Animales"],
-  ["necesidades", "Necesidades"],
-  ["refugios", "Refugios"],
-  ["respaldo", "Respaldo"],
-] as const;
-type Tab = (typeof TABS)[number][0];
+type Rol = "admin" | "moderador" | "refugio";
+type Acceso = { role: Rol; shelter_id?: string | null };
+type Tab = "reportes" | "rescates" | "adopciones" | "animales" | "necesidades" | "refugios" | "equipo" | "respaldo" | "cuenta";
+
+// Cada tipo de acceso ve solo sus pestañas (la base de datos además lo exige por su cuenta)
+const TABS_POR_ROL: Record<Rol, Tab[]> = {
+  admin: ["reportes", "rescates", "adopciones", "animales", "necesidades", "refugios", "equipo", "respaldo", "cuenta"],
+  moderador: ["reportes", "rescates", "cuenta"],
+  refugio: ["adopciones", "animales", "necesidades", "refugios", "cuenta"],
+};
+const ETIQUETA: Record<Tab, string> = {
+  reportes: "Reportes", rescates: "Rescates", adopciones: "Adopciones", animales: "Animales", necesidades: "Necesidades",
+  refugios: "Refugios", equipo: "Equipo", respaldo: "Respaldo", cuenta: "Mi cuenta",
+};
 
 function Login() {
   const [error, setError] = useState("");
@@ -38,8 +44,8 @@ function Login() {
   }
   return (
     <>
-      <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Panel del refugio</h1>
-      <p className="lead">Entra con tu cuenta de administrador.</p>
+      <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Acceso al panel</h1>
+      <p className="lead">Para administradores, moderadores y personal de refugios.</p>
       <form className="stack" onSubmit={onSubmit}>
         <label>Correo<input name="email" type="email" autoComplete="username" required /></label>
         <label>Contraseña<input name="password" type="password" autoComplete="current-password" required /></label>
@@ -52,8 +58,9 @@ function Login() {
 
 export default function AdminApp() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
-  const [esAdmin, setEsAdmin] = useState<boolean | null>(null);
+  const [acceso, setAcceso] = useState<Acceso | null | undefined>(undefined); // undefined = verificando
   const [tab, setTab] = useState<Tab>("reportes");
+  const [nombreRefugio, setNombreRefugio] = useState("");
   const [pend, setPend] = useState({ reportes: 0, rescates: 0, urgentes: 0, adopciones: 0 });
   const [diasRespaldo, setDiasRespaldo] = useState<number | null>(null);
 
@@ -63,75 +70,108 @@ export default function AdminApp() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  const uid = session?.user.id;
   useEffect(() => {
-    if (!session) { setEsAdmin(null); return; }
-    supabase.rpc("is_admin").then(({ data }) => setEsAdmin(data === true));
-  }, [session]);
+    if (!uid) { setAcceso(undefined); return; }
+    supabase.rpc("my_access").then(({ data }) => setAcceso((data as Acceso | null) ?? null));
+  }, [uid]);
+
+  const rol = acceso?.role;
+  const refugioId = rol === "refugio" ? acceso?.shelter_id ?? undefined : undefined;
+  const visibles = rol ? TABS_POR_ROL[rol] : [];
+  const actual: Tab = visibles.includes(tab) ? tab : visibles[0] ?? "cuenta";
 
   useEffect(() => {
-    if (!esAdmin) return;
+    if (!refugioId) return;
+    supabase.from("shelters").select("name").eq("id", refugioId).single().then(({ data }) => setNombreRefugio(data?.name ?? ""));
+  }, [refugioId]);
+
+  // Contadores de pendientes: solo de lo que cada rol puede ver
+  useEffect(() => {
+    if (!rol) return;
     (async () => {
-      const cuenta = (tabla: string, urgente?: boolean) => {
-        let q = supabase.from(tabla).select("id", { count: "exact", head: true }).eq("status", "pendiente");
+      const cuenta = (tabla: string, estado: string, urgente?: boolean) => {
+        let q = supabase.from(tabla).select("id", { count: "exact", head: true }).eq("status", estado);
         if (urgente) q = q.eq("urgent", true);
         return q;
       };
+      const vacio = { count: 0 };
       const [a, b, c, d] = await Promise.all([
-        cuenta("reports"), cuenta("welfare_reports"), cuenta("welfare_reports", true),
-        supabase.from("adoption_requests").select("id", { count: "exact", head: true }).eq("status", "nueva"),
+        rol !== "refugio" ? cuenta("reports", "pendiente") : vacio,
+        rol !== "refugio" ? cuenta("welfare_reports", "pendiente") : vacio,
+        rol !== "refugio" ? cuenta("welfare_reports", "pendiente", true) : vacio,
+        rol !== "moderador" ? cuenta("adoption_requests", "nueva") : vacio,
       ]);
       setPend({ reportes: a.count ?? 0, rescates: b.count ?? 0, urgentes: c.count ?? 0, adopciones: d.count ?? 0 });
     })();
-  }, [esAdmin, tab]);
+  }, [rol, actual]);
 
   useEffect(() => {
     try {
       const v = localStorage.getItem(CLAVE_RESPALDO);
       setDiasRespaldo(v ? Math.floor((Date.now() - new Date(v).getTime()) / 864e5) : null);
     } catch { setDiasRespaldo(null); }
-  }, [tab]);
+  }, [actual]);
 
   if (session === undefined) return <p className="muted">Cargando…</p>;
   if (!session) return <Login />;
-  if (esAdmin === null) return <p className="muted">Verificando permisos…</p>;
-  if (!esAdmin)
+  if (acceso === undefined) return <p className="muted">Verificando permisos…</p>;
+  if (acceso === null || !rol)
     return (
       <>
         <h1>Sin permisos</h1>
-        <p>Tu cuenta ({session.user.email}) no está autorizada como administradora.</p>
+        <p>Tu cuenta ({session.user.email}) todavía no tiene acceso al panel. Pídele a quien administra el sitio que te lo active.</p>
         <button className="btn ghost" onClick={() => supabase.auth.signOut()}>Salir</button>
+      </>
+    );
+
+  const email = session.user.email ?? "";
+  const debeCambiar = session.user.user_metadata?.must_change_password === true;
+  const titulo = rol === "admin" ? "Panel de administración" : rol === "moderador" ? "Panel de moderación" : `Panel${nombreRefugio ? ` · ${nombreRefugio}` : " del refugio"}`;
+
+  // Cuenta nueva: primero hay que cambiar la contraseña temporal
+  if (debeCambiar)
+    return (
+      <>
+        <div className="section-head">
+          <h1 style={{ fontSize: "clamp(1.8rem,4vw,2.6rem)", margin: 0 }}>{titulo}</h1>
+          <button className="btn ghost" onClick={() => supabase.auth.signOut()}>Salir</button>
+        </div>
+        <AccountTab email={email} rolNombre={ROL_NOMBRE[rol]} obligatorio />
       </>
     );
 
   return (
     <>
       <div className="section-head">
-        <h1 style={{ fontSize: "clamp(1.8rem,4vw,2.6rem)", margin: 0 }}>Panel del refugio</h1>
+        <h1 style={{ fontSize: "clamp(1.8rem,4vw,2.6rem)", margin: 0 }}>{titulo}</h1>
         <button className="btn ghost" onClick={() => supabase.auth.signOut()}>Salir</button>
       </div>
       <div className="tabs" role="tablist">
-        {TABS.map(([id, label]) => (
-          <button key={id} role="tab" aria-selected={tab === id} onClick={() => setTab(id)}>
-            {label}
+        {visibles.map((id) => (
+          <button key={id} role="tab" aria-selected={actual === id} onClick={() => setTab(id)}>
+            {id === "refugios" && rol === "refugio" ? "Mi refugio" : ETIQUETA[id]}
             {id === "reportes" && pend.reportes > 0 && ` (${pend.reportes})`}
             {id === "adopciones" && pend.adopciones > 0 && ` (${pend.adopciones})`}
             {id === "rescates" && pend.rescates > 0 && ` (${pend.rescates})${pend.urgentes > 0 ? " ¡urgente!" : ""}`}
           </button>
         ))}
       </div>
-      {tab !== "respaldo" && (diasRespaldo === null || diasRespaldo >= 7) && (
+      {rol === "admin" && actual !== "respaldo" && (diasRespaldo === null || diasRespaldo >= 7) && (
         <p className="alertbox" role="status">
           {diasRespaldo === null ? "No has descargado un respaldo desde este navegador." : `Hace ${diasRespaldo} días que no descargas un respaldo.`}{" "}
           <button type="button" className="link" onClick={() => setTab("respaldo")}>Ir a Respaldo</button>
         </p>
       )}
-      {tab === "reportes" && <ReportsTab />}
-      {tab === "rescates" && <WelfareTab />}
-      {tab === "adopciones" && <AdoptionsTab />}
-      {tab === "animales" && <AnimalsTab />}
-      {tab === "necesidades" && <NeedsTab />}
-      {tab === "refugios" && <SheltersTab />}
-      {tab === "respaldo" && <BackupTab />}
+      {actual === "reportes" && <ReportsTab />}
+      {actual === "rescates" && <WelfareTab esAdmin={rol === "admin"} />}
+      {actual === "adopciones" && <AdoptionsTab rol={rol} />}
+      {actual === "animales" && <AnimalsTab shelterId={refugioId} />}
+      {actual === "necesidades" && <NeedsTab shelterId={refugioId} />}
+      {actual === "refugios" && <SheltersTab soloId={refugioId} />}
+      {actual === "equipo" && <TeamTab />}
+      {actual === "respaldo" && <BackupTab />}
+      {actual === "cuenta" && <AccountTab email={email} rolNombre={ROL_NOMBRE[rol]} obligatorio={false} />}
     </>
   );
 }

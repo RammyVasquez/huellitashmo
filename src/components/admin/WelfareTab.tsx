@@ -8,7 +8,7 @@ const ESTADOS = ["pendiente", "activo", "en_atencion", "resuelto", "cerrado"] as
 type Estado = (typeof ESTADOS)[number];
 const NOMBRE: Record<Estado, string> = { pendiente: "pendientes", activo: "activos", en_atencion: "en atención", resuelto: "resueltos", cerrado: "cerrados" };
 
-export default function WelfareTab() {
+export default function WelfareTab({ esAdmin = true }: { esAdmin?: boolean } = {}) {
   const [items, setItems] = useState<AdminWelfare[]>([]);
   const [filtro, setFiltro] = useState<Estado>("pendiente");
   const [msg, setMsg] = useState("");
@@ -89,10 +89,12 @@ export default function WelfareTab() {
 
   return (
     <>
+      {esAdmin && (
       <p className="muted" style={{ margin: "0 0 1rem" }}>
         <button className="btn ghost" onClick={probarAvisos}>Probar avisos al celular</button>{" "}
         <span role="status">{aviso}</span>
       </p>
+      )}
       {urgentesPend > 0 && <p className="alertbox" role="alert"><b>{urgentesPend} {urgentesPend === 1 ? "reporte urgente pendiente" : "reportes urgentes pendientes"}.</b> Revísalos primero.</p>}
       <div className="chips">
         {ESTADOS.map((e) => (
@@ -153,6 +155,8 @@ export default function WelfareTab() {
         </div>
       ))}
 
+      {esAdmin && (
+        <>
       <h2 style={{ marginTop: "3rem" }}>Contactos de ayuda (públicos)</h2>
       <p className="muted">Veterinarios 24 h, rescatistas o autoridades. Verifica cada número antes de publicarlo: aparece en la página de Rescate.</p>
       <form className="stack" key={formKey} onSubmit={agregarContacto}>
@@ -167,6 +171,8 @@ export default function WelfareTab() {
           <div className="row-actions"><button className="btn ghost" onClick={() => borrarContacto(c)}>Quitar</button></div>
         </div>
       ))}
+        </>
+      )}
     </>
   );
 }

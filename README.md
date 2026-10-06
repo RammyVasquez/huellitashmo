@@ -60,3 +60,11 @@ El panel tiene la pestaña “Rescates” y una lista editable de contactos de a
 Requiere `supabase/migracion-012-adopciones.sql`. Flujo: solicitud pública (`/animales/[id]/adoptar`) → panel Adopciones
 (etapas, avisos de compatibilidad, resumen para el refugio) → “Marcar adoptado” programa seguimientos a 1, 3 y 6 meses →
 la familia responde en `/seguimiento/[token]`.
+
+## Roles y accesos
+Requiere `supabase/migracion-013-roles.sql`. Tres tipos de acceso, que el administrador crea en Panel → Equipo:
+- **Administrador/a:** todo.
+- **Moderador/a:** reportes de mascotas y casos de rescate.
+- **Personal de refugio:** solo su refugio (perfil, animales, necesidades y solicitudes de adopción de sus animales).
+Las cuentas se crean desde el servidor (`/api/equipo`, con llave de servicio) con una contraseña temporal que se muestra una sola vez; la persona
+debe cambiarla al entrar. La separación de datos la exige la base de datos (RLS), no solo la interfaz.

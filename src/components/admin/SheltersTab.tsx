@@ -78,11 +78,25 @@ function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; o
   );
 }
 
-export default function SheltersTab() {
+export default function SheltersTab({ soloId }: { soloId?: string } = {}) {
   const { shelters, reload } = useShelters();
   const [editing, setEditing] = useState<Shelter | null>(null);
   const [formKey, setFormKey] = useState(0);
   const reset = () => { setEditing(null); setFormKey((k) => k + 1); };
+  const [guardado, setGuardado] = useState(false);
+  const propio = soloId ? shelters.find((x) => x.id === soloId) ?? null : null;
+
+  // Personal de refugio: solo edita el perfil de su propio refugio
+  if (soloId) {
+    return propio ? (
+      <>
+        <h2>Mi refugio</h2>
+        <p className="muted">Estos datos se muestran en tu perfil público.</p>
+        <ShelterForm key={formKey} initial={propio} onDone={() => { setFormKey((k) => k + 1); setGuardado(true); reload(); }} onCancel={() => setFormKey((k) => k + 1)} />
+        {guardado && <p className="ok" role="status">Cambios guardados.</p>}
+      </>
+    ) : <p className="muted">Cargando…</p>;
+  }
 
   return (
     <>

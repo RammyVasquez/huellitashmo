@@ -142,12 +142,32 @@ export default function AdoptionForm({ animalId, animalName, shelterName }: { an
 
       <section className="fs">
         <h2><span className="num">4</span> Compromisos</h2>
-        <label className="check"><input type="checkbox" checked={visita} onChange={(e) => setVisita(e.target.checked)} />
-          Acepto que el refugio me haga una entrevista y, si lo pide, una visita a mi hogar.</label>
-        <label className="check"><input type="checkbox" checked={compromiso} onChange={(e) => setCompromiso(e.target.checked)} />
-          Me comprometo a darle cuidados veterinarios y vacunas, esterilizarlo si aún no lo está, no venderlo ni regalarlo ni abandonarlo, y a regresarlo al refugio si ya no puedo cuidarlo.</label>
-        <label className="check"><input type="checkbox" checked={privacidad} onChange={(e) => setPrivacidad(e.target.checked)} />
-          Acepto que mis datos se compartan con {shelterName ?? "el refugio"} para evaluar mi solicitud, y el <a href="/privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad</a>.</label>
+        <p className="muted" style={{ margin: 0 }}>Marca las tres casillas para poder enviar tu solicitud.</p>
+        <label className="check">
+          <input type="checkbox" checked={visita} onChange={(e) => setVisita(e.target.checked)} />
+          <span className="check-body">
+            <strong>Entrevista y visita</strong>
+            <span>Acepto que el refugio me haga una entrevista y, si lo pide, una visita a mi hogar.</span>
+          </span>
+        </label>
+        <label className="check">
+          <input type="checkbox" checked={compromiso} onChange={(e) => setCompromiso(e.target.checked)} />
+          <span className="check-body">
+            <strong>Cuidado responsable de por vida</strong>
+            <span>Me comprometo a:</span>
+            <span className="linea">Darle cuidados veterinarios y vacunas.</span>
+            <span className="linea">Esterilizarlo si aún no lo está.</span>
+            <span className="linea">No venderlo, regalarlo ni abandonarlo.</span>
+            <span className="linea">Regresarlo al refugio si ya no puedo cuidarlo.</span>
+          </span>
+        </label>
+        <label className="check">
+          <input type="checkbox" checked={privacidad} onChange={(e) => setPrivacidad(e.target.checked)} />
+          <span className="check-body">
+            <strong>Privacidad</strong>
+            <span>Acepto que mis datos se compartan con {shelterName ?? "el refugio"} para evaluar mi solicitud, y el <a href="/privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad</a>.</span>
+          </span>
+        </label>
       </section>
 
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hp" />
