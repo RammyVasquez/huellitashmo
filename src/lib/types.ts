@@ -57,6 +57,7 @@ export type PublicReport = {
   status: "activo" | "reunificado";
   created_at: string;
   photos: string[] | null;
+  code?: string;
 };
 
 export type ImpactStats = {

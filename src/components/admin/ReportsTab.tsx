@@ -75,6 +75,15 @@ export default function ReportsTab() {
             {r.lat != null && r.lng != null
               ? <a href={`https://www.google.com/maps?q=${r.lat},${r.lng}`} target="_blank" rel="noopener noreferrer">Ver ubicación exacta</a>
               : <span className="muted">Sin ubicación en el mapa</span>}
+            {r.status === "activo" && (
+              <>
+                {" · "}
+                <a
+                  href={`https://wa.me/${r.contact_whatsapp}?text=${encodeURIComponent(`Hola, tu reporte ya está publicado en Huellitas HMO. Aquí puedes verlo e imprimir tu cartel: ${typeof window !== "undefined" ? window.location.origin : ""}/reportes/${r.id}/cartel`)}`}
+                  target="_blank" rel="noopener noreferrer"
+                >Mandar cartel por WhatsApp</a>
+              </>
+            )}
           </div>
           <div className="row-actions">
             {acciones[r.status].map(([label, dest, primary]) => (

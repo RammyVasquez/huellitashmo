@@ -121,6 +121,7 @@ export default function ReportsExplorer({ reports }: { reports: PublicReport[] }
                   <small className="muted">{r.zone} · {fechaCorta(r.created_at)}</small>
                   <div className="actions" style={{ marginBottom: 0 }}>
                     <a className="btn" href={`/api/contacto/${r.id}`}>Contactar por WhatsApp</a>
+                    <a className="btn ghost" href={`/reportes/${r.id}`}>Ver ficha y cartel</a>
                     {r.lat != null && (
                       <button className="btn ghost" onClick={() => { setSelected(r.id); document.querySelector(".map-box")?.scrollIntoView({ block: "center" }); }}>
                         Ver en el mapa
