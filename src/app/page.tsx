@@ -59,6 +59,7 @@ export default async function Home() {
               <div className="stat" key={label}><b>{n}</b><span>{label}</span></div>
             ))}
           </div>
+          <p style={{ margin: "1.2rem 0 0" }}><Link href="/impacto">Cómo contamos estas cifras</Link></p>
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Fredoka, Nunito } from "next/font/google";
+import Contacto from "@/components/Contacto";
 import SiteNav from "@/components/SiteNav";
 import "./globals.css";
 
@@ -56,7 +57,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               ¿Perdiste o encontraste una mascota? <Link href="/reportes/nuevo">Haz un reporte</Link>.
             </p>
             <p>
-              <Link href="/adopta">Cómo adoptar</Link> · <Link href="/match">Encuentra tu match</Link> · <Link href="/rescate">Animales heridos o maltratados</Link>
+              <Link href="/adopta">Cómo adoptar</Link> · <Link href="/match">Encuentra tu match</Link> · <Link href="/rescate">Animales heridos o maltratados</Link> · <Link href="/primeros-auxilios">Primeros auxilios</Link>
+            </p>
+            <p>
+              <Link href="/impacto">Impacto</Link> · <Link href="/privacidad">Privacidad</Link> · <Link href="/reglas">Reglas de uso</Link>
+              {process.env.NEXT_PUBLIC_CONTACT_EMAIL && <> · <Contacto prefijo="Contacto:" /></>}
             </p>
             <p className="footer-admin"><Link href="/admin">Acceso para administradores</Link></p>
           </div>

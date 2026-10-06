@@ -23,6 +23,7 @@ export default async function Rescate() {
       </p>
       <div className="actions">
         <Link className="btn" href="/rescate/nuevo">Reportar un animal en riesgo</Link>
+        <Link className="btn ghost" href="/primeros-auxilios">Primeros auxilios</Link>
       </div>
       <p className="muted" style={{ maxWidth: "62ch" }}>
         Los reportes de maltrato, abandono o encierro no se publican: los revisa nuestro equipo y los canaliza para proteger a todas las personas involucradas.

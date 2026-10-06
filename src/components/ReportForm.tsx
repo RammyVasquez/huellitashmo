@@ -139,6 +139,9 @@ export default function ReportForm() {
         <p className="muted" style={{ margin: 0, fontSize: ".95rem" }}>Tu número nunca se publica: la gente te escribe desde un botón.</p>
       </section>
 
+      <p className="muted" style={{ margin: 0, fontSize: ".92rem" }}>
+        Al enviar este reporte aceptas el <a href="/privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad</a> y las <a href="/reglas" target="_blank" rel="noopener noreferrer">reglas de uso</a>.
+      </p>
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hp" />
       <Turnstile onToken={setToken} resetKey={captchaKey} />
       <button className="btn big" disabled={estado === "enviando" || (CAPTCHA_ACTIVO && !token)}>

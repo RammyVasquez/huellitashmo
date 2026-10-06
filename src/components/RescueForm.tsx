@@ -91,7 +91,7 @@ export default function RescueForm({ contacts }: { contacts: HelpContact[] }) {
             ? "Revisaremos tu reporte y, si procede, lo publicaremos (sin tu número) para que la comunidad pueda ayudar."
             : "Tu reporte no se publica: lo revisa nuestro equipo y lo canaliza con quien pueda ayudar."}
         </p>
-        {urgent && <p className="alertbox"><b>Esta plataforma no es un servicio de emergencia.</b> Si el animal está grave, no esperes: busca ahora un veterinario o a la autoridad local.</p>}
+        {urgent && <p className="alertbox"><b>Esta plataforma no es un servicio de emergencia.</b> Si el animal está grave, no esperes: busca ahora un veterinario o a la autoridad local. <Link href="/primeros-auxilios">Ver primeros auxilios</Link>.</p>}
         <HelpContacts contacts={contacts} />
         <div className="actions">
           <Link className="btn" href="/rescate">Ver casos que necesitan ayuda</Link>
@@ -120,7 +120,7 @@ export default function RescueForm({ contacts }: { contacts: HelpContact[] }) {
         </label>
         {urgent && (
           <div className="alertbox">
-            <b>Esta plataforma no es un servicio de emergencia y no responde al instante.</b> Si el animal está grave, busca ahora un veterinario o a la autoridad local, y envía también este reporte.
+            <b>Esta plataforma no es un servicio de emergencia y no responde al instante.</b> Si el animal está grave, busca ahora un veterinario o a la autoridad local, y envía también este reporte. <Link href="/primeros-auxilios" target="_blank" rel="noopener noreferrer">Ver primeros auxilios (se abre en otra pestaña)</Link>.
             <HelpContacts contacts={contacts} />
           </div>
         )}
@@ -169,6 +169,9 @@ export default function RescueForm({ contacts }: { contacts: HelpContact[] }) {
         <p className="muted" style={{ margin: 0, fontSize: ".95rem" }}>Puedes reportar sin dejar ningún dato. Tu número nunca se publica.</p>
       </section>
 
+      <p className="muted" style={{ margin: 0, fontSize: ".92rem" }}>
+        Al enviar este reporte aceptas el <a href="/privacidad" target="_blank" rel="noopener noreferrer">aviso de privacidad</a> y las <a href="/reglas" target="_blank" rel="noopener noreferrer">reglas de uso</a>.
+      </p>
       <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hp" />
       <Turnstile onToken={setToken} resetKey={captchaKey} />
       <button className="btn big" disabled={estado === "enviando" || (CAPTCHA_ACTIVO && !token)}>

@@ -326,3 +326,25 @@ button.link { background: none; border: 0; padding: 0; font: inherit; color: var
 /* Buscador */
 .buscador { margin: 0 0 1rem; max-width: 560px; }
 input[type="search"] { width: 100%; }
+
+/* Páginas de texto y transparencia */
+.prose { max-width: 70ch; }
+.prose h2 { font-size: 1.4rem; margin-top: 2.2rem; }
+.prose ul { padding-left: 1.2rem; }
+.prose li { margin-bottom: .55rem; }
+.updated { color: var(--muted); font-size: .95rem; }
+.defs dt { font-weight: 700; margin-top: 1rem; }
+.defs dd { margin: 0 0 .4rem; color: var(--muted); }
+.impact a { color: var(--sol); }
+.shelter-logos { display: flex; flex-wrap: wrap; gap: .7rem; }
+.shelter-chip { display: inline-flex; align-items: center; gap: .6rem; padding: .5rem 1rem .5rem .5rem; border-radius: 99px; box-shadow: inset 0 0 0 2px var(--line); text-decoration: none; color: var(--navy); font-weight: 700; min-height: 44px; }
+.shelter-chip img, .shelter-chip .logo { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; font-size: 1rem; }
+
+/* Primeros auxilios */
+.aux { display: grid; gap: 1.2rem; margin-top: 1.4rem; }
+.aux-card { background: var(--white); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); padding: 1.2rem 1.4rem; scroll-margin-top: 5rem; max-width: 760px; }
+.aux-card h2 { font-size: 1.35rem; margin-bottom: .4rem; }
+.aux-card ol { margin: .4rem 0 0; padding-left: 1.4rem; }
+.aux-card li { margin-bottom: .6rem; }
+.aux-card li.no { color: #7a2a20; }
+.aux-card li.no::marker { color: var(--alert); font-weight: 700; }
