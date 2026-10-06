@@ -94,6 +94,11 @@ export default async function Impacto() {
           </div>
         )}
 
+        <h2>Qué significa “Verificado”</h2>
+        <p>
+          El sello aparece cuando el equipo de Huellitas HMO comprobó la identidad de la persona u organización (por ejemplo, hablando con ella y revisando su trabajo público) y que realiza labores de rescate o cuidado de animales en Hermosillo. No es una certificación oficial ni una garantía: si ves algo extraño, escríbenos.
+        </p>
+
         <h2>Cómo se sostiene el proyecto</h2>
         <ul>
           <li>Funciona con servicios de plan gratuito y no cobra ni maneja dinero.</li>

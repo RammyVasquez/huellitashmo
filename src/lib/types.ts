@@ -15,6 +15,7 @@ export type Animal = {
   sponsorable: boolean;
   sponsors: number;
   created_at: string;
+  photos: string[] | null;
   size: "pequeno" | "mediano" | "grande" | null;
   energy: "tranquilo" | "moderado" | "activo" | null;
   age_group: "cachorro" | "joven" | "adulto" | "senior" | null;
@@ -34,6 +35,8 @@ export type Shelter = {
   lng: number | null;
   facebook_url: string | null;
   instagram_url: string | null;
+  kind: "refugio" | "hogar_temporal" | "rescatista" | "colectivo";
+  verified_at: string | null;
 };
 
 export type ShelterNeed = {

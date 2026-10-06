@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import AnimalCard from "@/components/AnimalCard";
 import FacebookFeed from "@/components/FacebookFeed";
 import ShareButtons from "@/components/ShareButtons";
+import ShelterBadges from "@/components/ShelterBadges";
 import ShelterMiniMap from "@/components/ShelterMiniMap";
 import { getShelter } from "@/lib/data";
 import { supabase } from "@/lib/supabase";
@@ -52,6 +53,7 @@ export default async function Refugio({ params }: { params: { id: string } }) {
         {s.logo_url ? <img className="logo big" src={s.logo_url} alt={`Logo de ${s.name}`} /> : <span className="logo big fallback" aria-hidden="true">{s.name.trim().charAt(0).toUpperCase()}</span>}
         <div>
           <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)", marginBottom: ".4rem" }}>{s.name}</h1>
+          <ShelterBadges kind={s.kind} verifiedAt={s.verified_at} />
           <span className="tag">{animals.length} {animals.length === 1 ? "animal registrado" : "animales registrados"}</span>
           {adoptados > 0 && <span className="tag ok">{adoptados} {adoptados === 1 ? "adoptado" : "adoptados"}</span>}
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ShelterBadges from "@/components/ShelterBadges";
 import { supabase } from "@/lib/supabase";
 import type { Shelter } from "@/lib/types";
 
@@ -20,7 +21,7 @@ export default async function Refugios() {
             <Link key={s.id} href={`/refugios/${s.id}`} className="shelter-card" style={{ textDecoration: "none", color: "inherit" }}>
               <div className="shelter-head">
                 {s.logo_url ? <img className="logo" src={s.logo_url} alt="" /> : <span className="logo fallback" aria-hidden="true">{s.name.trim().charAt(0).toUpperCase()}</span>}
-                <div><h2>{s.name}</h2></div>
+                <div><h2>{s.name}</h2><ShelterBadges kind={s.kind} verifiedAt={s.verified_at} /></div>
               </div>
               {s.about && <p>{s.about}</p>}
               <span className="btn ghost">Conocer al refugio</span>

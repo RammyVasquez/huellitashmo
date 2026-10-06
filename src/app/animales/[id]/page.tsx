@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import AnimalGallery from "@/components/AnimalGallery";
+import ShelterBadges from "@/components/ShelterBadges";
 import ShareButtons from "@/components/ShareButtons";
 import { getAnimal, getShelter } from "@/lib/data";
 
@@ -18,8 +20,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   return {
     title: `${title} · Huellitas HMO`,
     description,
-    openGraph: { title, description, type: "article", images: a.photo_url ? [{ url: a.photo_url }] : undefined },
-    twitter: { card: "summary_large_image", title, description, images: a.photo_url ? [a.photo_url] : undefined },
+    openGraph: { title, description, type: "article", images: (a.photos?.[0] ?? a.photo_url) ? [{ url: (a.photos?.[0] ?? a.photo_url)! }] : undefined },
+    twitter: { card: "summary_large_image", title, description, images: (a.photos?.[0] ?? a.photo_url) ? [(a.photos?.[0] ?? a.photo_url)!] : undefined },
   };
 }
 
@@ -37,7 +39,7 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
     <div className="wrap page">
       <p><Link href="/animales">← Todos los animales</Link></p>
       <div className="ficha">
-        {a.photo_url ? <img src={a.photo_url} alt={`Foto de ${a.name}`} /> : <div className="box" style={{ aspectRatio: "4/5" }} />}
+        <AnimalGallery photos={a.photos?.length ? a.photos : a.photo_url ? [a.photo_url] : []} name={a.name} />
         <div>
           <h1 style={{ fontSize: "clamp(2.2rem,5vw,3.2rem)" }}>{a.name}</h1>
           <p>
@@ -75,6 +77,7 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
           {shelter && (
             <div className="box">
               <h3><Link href={`/refugios/${shelter.id}`}>{shelter.name}</Link></h3>
+              <p><ShelterBadges kind={shelter.kind} verifiedAt={shelter.verified_at} /></p>
               {shelter.address && <p>{shelter.address}</p>}
               <p className="muted" style={{ margin: 0 }}>
                 ¿Es tu primera adopción? Lee <Link href="/adopta">cómo funciona y qué te pedirán</Link>.

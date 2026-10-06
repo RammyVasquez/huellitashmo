@@ -2,6 +2,7 @@
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import type { Shelter, ShelterNeed } from "@/lib/types";
+import ShelterBadges from "./ShelterBadges";
 
 const ShelterMap = dynamic(() => import("./ShelterMap"), {
   ssr: false,
@@ -154,6 +155,7 @@ export default function DonarExplorer({ shelters, needs }: { shelters: Shelter[]
                 <div>
                   <h2>{s.name}</h2>
                   <div>
+                    <ShelterBadges kind={s.kind} verifiedAt={s.verified_at} />
                     {nearest && <span className="tag urgente">El más cercano</span>}
                     {d != null && <span className="tag">a {fmt(d)}</span>}
                   </div>

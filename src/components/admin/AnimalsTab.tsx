@@ -3,8 +3,12 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { uploadPhoto } from "@/lib/upload";
 import { errTexto } from "@/lib/util";
+import PhotoPicker from "../PhotoPicker";
 import { useShelters } from "./useShelters";
 import type { Animal } from "@/lib/types";
+
+const MAX_FOTOS = 8;
+const fotosDe = (a: Animal | null) => (a ? (a.photos?.length ? a.photos : a.photo_url ? [a.photo_url] : []) : []);
 
 export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
   const { shelters, cargando } = useShelters();
@@ -12,6 +16,8 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [editing, setEditing] = useState<Animal | null>(null);
   const [formKey, setFormKey] = useState(0);
+  const [fotos, setFotos] = useState<string[]>([]);   // fotos que ya tiene (se pueden quitar o cambiar de orden)
+  const [nuevas, setNuevas] = useState<File[]>([]);     // fotos nuevas por subir
   const [guardando, setGuardando] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -29,8 +35,9 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
     setGuardando(true);
     setMsg(null);
     try {
-      const file = fd.get("foto") as File;
-      const photo_url = file && file.size > 0 ? await uploadPhoto(file, "animales") : editing?.photo_url ?? null;
+      if (fotos.length + nuevas.length > MAX_FOTOS) throw new Error(`Máximo ${MAX_FOTOS} fotos por animal.`);
+      const subidas = await Promise.all(nuevas.map((f) => uploadPhoto(f, "animales")));
+      const lista = [...fotos, ...subidas];
       const status = String(fd.get("status"));
       const payload = {
         shelter_id: String(fd.get("shelter_id")) || null,
@@ -39,7 +46,8 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
         sex: fd.get("sex") || null,
         age_text: String(fd.get("age_text")).trim() || null,
         description: String(fd.get("description")).trim() || null,
-        photo_url,
+        photo_url: lista[0] ?? null,
+        photos: lista,
         age_group: String(fd.get("age_group")) || null,
         size: String(fd.get("size")) || null,
         energy: String(fd.get("energy")) || null,
@@ -59,6 +67,8 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
       if (error) throw error;
       setMsg({ ok: true, text: editing ? "Cambios guardados." : "Animal registrado." });
       setEditing(null);
+      setFotos([]);
+      setNuevas([]);
       setFormKey((k) => k + 1);
       load();
     } catch (err) {
@@ -79,6 +89,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
   return (
     <>
       <h2>{editing ? `Editar a ${editing.name}` : "Registrar animal"}</h2>
+      {editing && <p className="box" role="status">Estás editando a <b>{editing.name}</b>. Cambia lo que necesites y pulsa “Guardar cambios”.</p>}
       <form className="stack" key={`${formKey}-${shelters.length}`} onSubmit={onSubmit}>
         {shelterId ? <input type="hidden" name="shelter_id" value={shelterId} /> : (
           <label>Refugio
@@ -132,9 +143,22 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
           </label>
         </div>
         <label>Su historia y carácter<textarea name="description" rows={4} defaultValue={editing?.description ?? ""} /></label>
-        <label>Foto {editing?.photo_url && <span className="muted">(ya tiene; sube otra para reemplazarla)</span>}
-          <input name="foto" type="file" accept="image/*" />
-        </label>
+        <div>
+          <b>Fotos <span className="muted" style={{ fontWeight: 400 }}>(hasta {MAX_FOTOS}; la primera es la principal)</span></b>
+          {fotos.length > 0 && (
+            <div className="previews">
+              {fotos.map((u, i) => (
+                <div className="preview" key={u}>
+                  <img src={u} alt={`Foto ${i + 1}`} />
+                  {i === 0 && <span className="foto-tag">Principal</span>}
+                  {i > 0 && <button type="button" className="foto-principal" onClick={() => setFotos((f) => [f[i], ...f.filter((_, k) => k !== i)])}>Hacer principal</button>}
+                  <button type="button" className="preview-x" aria-label={`Quitar foto ${i + 1}`} onClick={() => setFotos((f) => f.filter((_, k) => k !== i))}>×</button>
+                </div>
+              ))}
+            </div>
+          )}
+          <PhotoPicker key={formKey} max={Math.max(0, MAX_FOTOS - fotos.length)} onChange={setNuevas} />
+        </div>
         <label>Estado
           <select name="status" defaultValue={editing?.status ?? "disponible"}>
             <option value="disponible">Disponible</option>
@@ -148,7 +172,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
         <label>Número de padrinos<input name="sponsors" type="number" min={0} defaultValue={editing?.sponsors ?? 0} /></label>
         <div className="actions" style={{ margin: 0 }}>
           <button className="btn" disabled={guardando}>{guardando ? "Guardando…" : editing ? "Guardar cambios" : "Registrar animal"}</button>
-          {editing && <button type="button" className="btn ghost" onClick={() => { setEditing(null); setFormKey((k) => k + 1); }}>Cancelar</button>}
+          {editing && <button type="button" className="btn ghost" onClick={() => { setEditing(null); setFotos([]); setNuevas([]); setFormKey((k) => k + 1); }}>Cancelar</button>}
         </div>
         {msg && <p className={msg.ok ? "ok" : "error"} role="status">{msg.text}</p>}
       </form>
@@ -163,7 +187,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
             {a.sponsorable && <span className="tag">apadrinable · {a.sponsors}</span>}
           </div>
           <div className="row-actions">
-            <button className="btn ghost" onClick={() => { setEditing(a); setFormKey((k) => k + 1); window.scrollTo({ top: 0 }); }}>Editar</button>
+            <button className="btn ghost" onClick={() => { setEditing(a); setFotos(fotosDe(a)); setNuevas([]); setFormKey((k) => k + 1); window.scrollTo({ top: 0 }); }}>Editar</button>
             {a.status !== "adoptado" && <button className="btn alt" onClick={() => marcarAdoptado(a)}>Marcar adoptado</button>}
           </div>
         </div>

@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { uploadPhoto } from "@/lib/upload";
 import { cleanSocial, errTexto, normalizeWa } from "@/lib/util";
 import { useShelters } from "./useShelters";
+import { TIPOS, type TipoRefugio } from "@/lib/refugios";
 import type { Shelter } from "@/lib/types";
 
 function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; onDone: () => void; onCancel: () => void }) {
@@ -29,6 +30,7 @@ function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; o
       const logo_url = file && file.size > 0 ? await uploadPhoto(file, "logos") : initial?.logo_url ?? null;
       const payload = {
         name: String(fd.get("name")).trim(),
+        kind: String(fd.get("kind")) || "refugio",
         whatsapp: normalizeWa(String(fd.get("whatsapp"))),
         address: String(fd.get("address")).trim() || null,
         drop_off_hours: String(fd.get("drop_off_hours")).trim() || null,
@@ -54,7 +56,12 @@ function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; o
 
   return (
     <form className="stack" onSubmit={onSubmit}>
-      <label>Nombre del refugio<input name="name" defaultValue={initial?.name ?? ""} required /></label>
+      <label>Tipo
+        <select name="kind" defaultValue={initial?.kind ?? "refugio"}>
+          {(Object.keys(TIPOS) as TipoRefugio[]).map((k) => <option key={k} value={k}>{TIPOS[k]}</option>)}
+        </select>
+      </label>
+      <label>Nombre (del refugio, hogar temporal, rescatista o colectivo)<input name="name" defaultValue={initial?.name ?? ""} required /></label>
       <label>WhatsApp (10 dígitos; agregamos la lada de país)<input name="whatsapp" inputMode="numeric" defaultValue={initial?.whatsapp ?? ""} /></label>
       <label>Sobre el refugio (1 o 2 frases)<textarea name="about" rows={3} defaultValue={initial?.about ?? ""} /></label>
       <label>Dirección donde reciben donativos<input name="address" defaultValue={initial?.address ?? ""} /></label>
@@ -84,6 +91,13 @@ export default function SheltersTab({ soloId }: { soloId?: string } = {}) {
   const [formKey, setFormKey] = useState(0);
   const reset = () => { setEditing(null); setFormKey((k) => k + 1); };
   const [guardado, setGuardado] = useState(false);
+  const [aviso, setAviso] = useState("");
+  async function verificar(sh: Shelter, valor: boolean) {
+    if (valor && !confirm(`¿Confirmas que comprobaste quién es “${sh.name}” y que realiza labores de rescate o cuidado de animales en Hermosillo? Aparecerá el sello “Verificado” en su perfil público.`)) return;
+    setAviso("");
+    const { error } = await supabase.from("shelters").update({ verified_at: valor ? new Date().toISOString() : null }).eq("id", sh.id);
+    if (error) setAviso(`No se pudo cambiar la verificación: ${errTexto(error)}`); else reload();
+  }
   const propio = soloId ? shelters.find((x) => x.id === soloId) ?? null : null;
 
   // Personal de refugio: solo edita el perfil de su propio refugio
@@ -104,15 +118,21 @@ export default function SheltersTab({ soloId }: { soloId?: string } = {}) {
       <ShelterForm key={formKey} initial={editing} onDone={() => { reset(); reload(); }} onCancel={reset} />
 
       <h2 style={{ marginTop: "2.5rem" }}>Refugios registrados ({shelters.length})</h2>
+      {aviso && <p className="error" role="alert">{aviso}</p>}
       {shelters.map((s) => (
         <div className="admin-row" key={s.id}>
           {s.logo_url ? <img className="thumb" src={s.logo_url} alt="" /> : <div className="thumb" />}
           <div className="grow">
             <b>{s.name}</b>
+            <div>
+              <span className="tag">{TIPOS[(s.kind ?? "refugio") as TipoRefugio]}</span>
+              {s.verified_at ? <span className="tag ok">Verificado</span> : <span className="tag">Sin verificar</span>}
+            </div>
             <div className="muted">{s.address || "Sin dirección"}{s.lat == null && " · sin ubicación en el mapa"}</div>
           </div>
           <div className="row-actions">
             <button className="btn ghost" onClick={() => { setEditing(s); setFormKey((k) => k + 1); window.scrollTo({ top: 0 }); }}>Editar</button>
+            <button className="btn ghost" onClick={() => verificar(s, !s.verified_at)}>{s.verified_at ? "Quitar verificación" : "Verificar"}</button>
           </div>
         </div>
       ))}
