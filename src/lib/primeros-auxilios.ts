@@ -15,7 +15,7 @@ export const EMERGENCIAS: Emergencia[] = [
     ],
   },
   {
-    id: "vía-aérea",
+    id: "via-aerea",
     titulo: "Se ahoga con un hueso u objeto",
     pasos: [
       "Mantener la calma y abrir la boca. Si el objeto está claramente visible y se puede retirar fácilmente, extraerlo con cuidado.",

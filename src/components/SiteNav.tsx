@@ -25,11 +25,11 @@ export default function SiteNav() {
 
   return (
     <>
-      <button className="nav-toggle" aria-expanded={open} aria-controls="menu-principal" onClick={() => setOpen((o) => !o)}>
+      <button className="nav-toggle" aria-expanded={open} aria-controls="menu-principal" aria-label={open ? "Cerrar menú" : "Abrir menú"} onClick={() => setOpen((o) => !o)}>
         <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
           {open ? <path d="M4 4l12 12M16 4L4 16" /> : <path d="M3 5h14M3 10h14M3 15h14" />}
         </svg>
-        {open ? "Cerrar" : "Menú"}
+        <span className="nav-label">{open ? "Cerrar" : "Menú"}</span>
       </button>
       <nav id="menu-principal" aria-label="Principal" className={`nav-links${open ? " open" : ""}`}>
         {LINKS.map(([href, label]) => (
@@ -38,6 +38,10 @@ export default function SiteNav() {
           </Link>
         ))}
       </nav>
+      <Link href="/primeros-auxilios" className="emerg" aria-label="Emergencia con tu mascota: primeros auxilios">
+        <svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M10 3v14M3 10h14" /></svg>
+        Emergencia
+      </Link>
     </>
   );
 }

@@ -6,11 +6,11 @@ export default function HelpContacts({ contacts }: { contacts: HelpContact[] }) 
       <h3 style={{ marginTop: 0 }}>Dónde pedir ayuda</h3>
       <p style={{ margin: "0 0 .6rem" }}>Si hay una persona en peligro o un delito en curso, llama al <b>911</b>.</p>
       {contacts.length > 0 && (
-        <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
+        <ul className="contactos">
           {contacts.map((c) => (
-            <li key={c.id}>
-              <b>{c.name}</b> · <a href={`tel:${c.phone.replace(/[^\d+]/g, "")}`}>{c.phone}</a>
-              {c.note && <span className="muted"> · {c.note}</span>}
+            <li key={c.id} className="contacto">
+              <div><b>{c.name}</b>{c.note && <span className="muted"> · {c.note}</span>}</div>
+              <a className="btn call" href={`tel:${c.phone.replace(/[^\d+]/g, "")}`} aria-label={`Llamar a ${c.name}`}>Llamar · {c.phone}</a>
             </li>
           ))}
         </ul>

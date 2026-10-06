@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import AnimalCard from "@/components/AnimalCard";
+import { EMERGENCIAS } from "@/lib/primeros-auxilios";
 import type { Animal, ImpactStats } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,19 @@ export default async function Home() {
         ) : (
           <div className="hero-photo"><div className="ph" /></div>
         )}
+      </div>
+
+      <div className="wrap">
+        <section className="aux-band" aria-labelledby="aux-titulo">
+          <div>
+            <h2 id="aux-titulo">¿Emergencia con tu mascota?</h2>
+            <p style={{ margin: 0 }}>Qué hacer en los primeros minutos, mientras llegas con el veterinario.</p>
+          </div>
+          <div className="chips" style={{ margin: 0 }}>
+            {EMERGENCIAS.map((e) => <Link key={e.id} href={`/primeros-auxilios#${e.id}`}>{e.titulo}</Link>)}
+          </div>
+          <div><Link className="btn call" href="/primeros-auxilios">Ver todos los primeros auxilios</Link></div>
+        </section>
       </div>
 
       <section className="impact" aria-label="Impacto de la plataforma">

@@ -159,8 +159,9 @@ img { max-width: 100%; }
 .nav-links a:hover, .nav-links a[aria-current="page"] { text-decoration: underline; text-decoration-color: var(--sol); text-decoration-thickness: 3px; text-underline-offset: 5px; }
 footer.site .footer-admin { margin: 1.2rem 0 0; font-size: .92rem; opacity: .85; }
 
-@media (max-width: 900px) {
-  .nav-toggle { display: inline-flex; }
+@media (max-width: 1100px) {
+  .emerg { order: 1; }
+  .nav-toggle { display: inline-flex; order: 2; }
   .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 0; background: var(--white); border-bottom: 1px solid var(--line); padding: .3rem 1.1rem 1rem; box-shadow: 0 14px 22px rgba(19,40,79,.14); }
   .nav-links.open { display: flex; }
   .nav-links a { padding: .9rem 0; font-size: 1.1rem; border-bottom: 1px solid var(--line); }
@@ -361,3 +362,24 @@ input[type="search"] { width: 100%; }
 .check-body .linea::before { content: "•"; position: absolute; left: .1rem; }
 .check-body a { color: var(--navy-soft); }
 @media (max-width: 760px) { .form-card label.check { padding: .8rem .85rem; gap: .7rem; } }
+
+/* Emergencia: siempre a la vista */
+.emerg { display: inline-flex; align-items: center; gap: .45rem; min-height: 44px; padding: .45rem 1rem; border-radius: 999px; background: var(--alert); color: #fff; font-weight: 800; text-decoration: none; white-space: nowrap; box-shadow: 0 2px 0 rgba(0,0,0,.15); }
+.emerg:hover { background: #9c2e23; color: #fff; }
+.emerg svg { width: 18px; height: 18px; flex: none; }
+.aux-band { background: #fbe3df; border-radius: var(--radius); border-left: 8px solid var(--alert); padding: 1.2rem 1.4rem; display: grid; gap: .9rem; margin: 0 0 .5rem; }
+.aux-band h2 { margin: 0 0 .2rem; color: #5b1d16; font-size: clamp(1.4rem, 4vw, 1.9rem); }
+.aux-band .chips a { background: #fff; }
+.btn.call { background: var(--alert); color: #fff; }
+.btn.call:hover { background: #9c2e23; }
+ul.contactos { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
+.contacto { display: flex; justify-content: space-between; align-items: center; gap: .8rem; flex-wrap: wrap; }
+.contacto .btn { padding: .55rem 1.1rem; }
+@media (max-width: 520px) {
+  header.site .wrap { flex-wrap: nowrap; gap: .5rem; padding: .6rem .8rem; }
+  .brand { font-size: 1.05rem; gap: .35rem; min-width: 0; }
+  .brand svg { width: 26px; height: 26px; }
+  .emerg { padding: .4rem .75rem; font-size: .9rem; }
+  .nav-label { display: none; }
+  .nav-toggle { padding: .4rem .7rem; }
+}
