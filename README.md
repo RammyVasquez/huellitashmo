@@ -68,3 +68,12 @@ Requiere `supabase/migracion-013-roles.sql`. Tres tipos de acceso, que el admini
 - **Personal de refugio:** solo su refugio (perfil, animales, necesidades y solicitudes de adopción de sus animales).
 Las cuentas se crean desde el servidor (`/api/equipo`, con llave de servicio) con una contraseña temporal que se muestra una sola vez; la persona
 debe cambiarla al entrar. La separación de datos la exige la base de datos (RLS), no solo la interfaz.
+
+## Avisos por correo a refugios
+Requiere `supabase/migracion-016-correo-refugios.sql`. Cada refugio tiene un correo privado para avisos (tabla `shelter_private`,
+nunca pública) que se llena en Panel → Refugios (o “Mi refugio”). Cuando llega una solicitud de adopción o responden un seguimiento,
+el refugio recibe un correo SIN datos personales de las familias, con una liga al panel. El envío usa Gmail con contraseña de aplicación
+(`GMAIL_USER`, `GMAIL_APP_PASSWORD`) o Resend (`RESEND_API_KEY`, `NOTIFY_EMAIL_FROM`).
+
+## Importar animales desde Excel
+Panel → Animales → “Importar varios animales desde Excel o CSV”. Plantilla descargable, vista previa con errores y duplicados, hasta 300 filas.

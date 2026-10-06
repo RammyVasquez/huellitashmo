@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { uploadPhoto } from "@/lib/upload";
 import { errTexto } from "@/lib/util";
 import PhotoPicker from "../PhotoPicker";
+import ImportAnimals from "./ImportAnimals";
 import { useShelters } from "./useShelters";
 import type { Animal } from "@/lib/types";
 
@@ -88,6 +89,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
 
   return (
     <>
+      {!editing && <ImportAnimals shelters={visibles} shelterId={shelterId} existentes={animals} onDone={load} />}
       <h2>{editing ? `Editar a ${editing.name}` : "Registrar animal"}</h2>
       {editing && <p className="box" role="status">Estás editando a <b>{editing.name}</b>. Cambia lo que necesites y pulsa “Guardar cambios”.</p>}
       <form className="stack" key={`${formKey}-${shelters.length}`} onSubmit={onSubmit}>

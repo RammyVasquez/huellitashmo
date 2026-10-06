@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { avisarAdmin, avisarError, sitioUrl } from "@/lib/server/notify";
+import { avisarAdmin, avisarError, avisarRefugio, sitioUrl } from "@/lib/server/notify";
 import { ErrorUsuario, ipDe, opcion, texto, verificarCaptcha } from "@/lib/server/intake";
 import { normalizeWa } from "@/lib/util";
 
@@ -61,6 +61,20 @@ export async function POST(req: Request) {
       refugio = sh?.name ?? "";
     }
     await avisarAdmin("Nueva solicitud de adopción", [`Animal: ${animal.name}`, refugio ? `Refugio: ${refugio}` : ""].filter(Boolean), `${sitioUrl()}/admin`);
+    await avisarRefugio(
+      animal.shelter_id,
+      `Nueva solicitud de adopción para ${animal.name}`,
+      [
+        "Hola,",
+        "",
+        `Recibiste una nueva solicitud de adopción para ${animal.name} en Huellitas HMO.`,
+        "",
+        `Entra a tu panel para ver las respuestas y decidir: ${sitioUrl()}/admin`,
+        "",
+        "Los datos de las personas que solicitan no se publican: solo los ven tú y el equipo de Huellitas HMO.",
+        "Si ya no quieres recibir estos avisos, quita tu correo en “Mi refugio” del panel.",
+      ].join("\n")
+    );
     return NextResponse.json({ ok: true });
   } catch (e) {
     if (e instanceof ErrorUsuario) return NextResponse.json({ error: e.message }, { status: 400 });

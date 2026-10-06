@@ -1,3 +1,6 @@
+import { supabaseAdmin } from "@/lib/supabase";
+import { enviarCorreo } from "@/lib/server/correo";
+
 type Canal = "enviado" | "falló" | "no configurado";
 
 // Avisa al administrador por Telegram y/o correo. Nunca incluye teléfonos ni el texto del reporte:
@@ -11,9 +14,7 @@ export async function avisarAdmin(
 
   const tgToken = process.env.TELEGRAM_BOT_TOKEN;
   const tgChat = process.env.TELEGRAM_CHAT_ID;
-  const resendKey = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL_TO;
-  const from = process.env.NOTIFY_EMAIL_FROM;
 
   // Lee el motivo que devuelve el servicio (no contiene llaves) para poder diagnosticar
   const motivo = async (r: Response) => {
@@ -42,22 +43,9 @@ export async function avisarAdmin(
   };
 
   const correo = async (): Promise<{ canal: Canal; detalle?: string }> => {
-    if (!resendKey || !to || !from) return { canal: "no configurado" };
-    try {
-      const r = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ from, to: [to], subject: titulo, text: texto }),
-        cache: "no-store",
-      });
-      if (r.ok) return { canal: "enviado" };
-      const d = await motivo(r);
-      console.error("[aviso] Correo falló:", d);
-      return { canal: "falló", detalle: `Correo respondió: ${d}` };
-    } catch (e) {
-      console.error("[aviso] Correo sin conexión:", e);
-      return { canal: "falló", detalle: "no se pudo conectar con el servicio de correo" };
-    }
+    if (!to) return { canal: "no configurado" };
+    const r = await enviarCorreo(to, titulo, texto);
+    return r;
   };
 
   const [t, c] = await Promise.all([telegram(), correo()]);
@@ -72,4 +60,16 @@ export async function avisarError(ruta: string) {
   try {
     await avisarAdmin("⚠️ Falló un formulario del sitio", [`Ruta: ${ruta}`, "Revisa los registros (Logs) en Vercel."], `${sitioUrl()}/admin`);
   } catch { /* nunca debe impedir responder a la persona */ }
+}
+
+// Avisa por correo al refugio dueño del animal (correo privado en shelter_private). Nunca incluye datos personales de las familias.
+export async function avisarRefugio(shelterId: string | null, asunto: string, cuerpo: string) {
+  if (!shelterId) return;
+  try {
+    const { data } = await supabaseAdmin().from("shelter_private").select("notify_email").eq("shelter_id", shelterId).maybeSingle();
+    const para = data?.notify_email;
+    if (para) await enviarCorreo(para, asunto, cuerpo);
+  } catch (e) {
+    console.error("[aviso refugio]", e instanceof Error ? e.message : "error");
+  }
 }

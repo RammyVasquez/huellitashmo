@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { uploadPhoto } from "@/lib/upload";
 import { cleanSocial, errTexto, normalizeWa } from "@/lib/util";
@@ -12,6 +12,13 @@ function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; o
   const [lng, setLng] = useState(initial?.lng?.toString() ?? "");
   const [guardando, setGuardando] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [correo, setCorreo] = useState("");
+
+  useEffect(() => {
+    if (!initial?.id) return;
+    supabase.from("shelter_private").select("notify_email").eq("shelter_id", initial.id).maybeSingle()
+      .then(({ data }) => setCorreo(data?.notify_email ?? ""));
+  }, [initial?.id]);
 
   function usarMiUbicacion() {
     navigator.geolocation.getCurrentPosition(
@@ -43,10 +50,19 @@ function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; o
       };
       if ((payload.lat != null && Number.isNaN(payload.lat)) || (payload.lng != null && Number.isNaN(payload.lng)))
         throw new Error("Latitud y longitud deben ser números (ej. 29.0892 y -110.9613).");
-      const { error } = initial
-        ? await supabase.from("shelters").update(payload).eq("id", initial.id)
-        : await supabase.from("shelters").insert(payload);
-      if (error) throw error;
+      const email = correo.trim().toLowerCase();
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) throw new Error("El correo para avisos no es válido.");
+      let id = initial?.id;
+      if (initial) {
+        const { error } = await supabase.from("shelters").update(payload).eq("id", initial.id);
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase.from("shelters").insert(payload).select("id").single();
+        if (error) throw error;
+        id = data.id;
+      }
+      const { error: e2 } = await supabase.from("shelter_private").upsert({ shelter_id: id, notify_email: email || null, updated_at: new Date().toISOString() });
+      if (e2) throw e2;
       onDone();
     } catch (err) {
       setMsg({ ok: false, text: `No se pudo guardar: ${errTexto(err)}` });
@@ -63,6 +79,10 @@ function ShelterForm({ initial, onDone, onCancel }: { initial: Shelter | null; o
       </label>
       <label>Nombre (del refugio, hogar temporal, rescatista o colectivo)<input name="name" defaultValue={initial?.name ?? ""} required /></label>
       <label>WhatsApp (10 dígitos; agregamos la lada de país)<input name="whatsapp" inputMode="numeric" defaultValue={initial?.whatsapp ?? ""} /></label>
+      <label>Correo para avisos (privado: no se publica)
+        <input type="email" value={correo} onChange={(e) => setCorreo(e.target.value)} placeholder="correo@ejemplo.com" autoComplete="off" />
+      </label>
+      <p className="muted" style={{ margin: "-.4rem 0 0", fontSize: ".92rem" }}>Te avisamos aquí cuando llegue una solicitud de adopción o respondan un seguimiento.</p>
       <label>Sobre el refugio (1 o 2 frases)<textarea name="about" rows={3} defaultValue={initial?.about ?? ""} /></label>
       <label>Dirección donde reciben donativos<input name="address" defaultValue={initial?.address ?? ""} /></label>
       <label>Horario de recepción<input name="drop_off_hours" placeholder="Sábados y domingos de 10:00 a 14:00" defaultValue={initial?.drop_off_hours ?? ""} /></label>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { avisarAdmin, avisarError, sitioUrl } from "@/lib/server/notify";
+import { avisarAdmin, avisarError, avisarRefugio, sitioUrl } from "@/lib/server/notify";
 import { ErrorUsuario, ipDe, opcion, subirFotos, verificarCaptcha } from "@/lib/server/intake";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,10 @@ export async function POST(req: Request) {
     if (notes.length > 2000) throw new ErrorUsuario("El comentario es demasiado largo.");
 
     const db = supabaseAdmin();
-    const { data: f } = await db.from("adoption_followups").select("id, status, stage").eq("token", token).single();
+    const { data: fila } = await db.from("adoption_followups")
+      .select("id, status, stage, adoption_requests(animals(name, shelter_id))").eq("token", token).single();
+    type Fila = { id: string; status: string; stage: number; adoption_requests: { animals: { name: string; shelter_id: string | null } | null } | null };
+    const f = fila as unknown as Fila | null;
     if (!f) throw new ErrorUsuario("Esta liga no es válida.");
     if (f.status === "respondido") throw new ErrorUsuario("Ya recibimos tu respuesta. ¡Gracias!");
     if (f.status === "omitido") throw new ErrorUsuario("Este seguimiento ya no está activo.");
@@ -31,6 +34,12 @@ export async function POST(req: Request) {
     if (error) throw error;
 
     await avisarAdmin("Respondieron un seguimiento de adopción", [`Seguimiento de ${f.stage} ${f.stage === 1 ? "mes" : "meses"}`], `${sitioUrl()}/admin`);
+    const animal = f.adoption_requests?.animals;
+    await avisarRefugio(
+      animal?.shelter_id ?? null,
+      `Respondieron el seguimiento de ${animal?.name ?? "una adopción"}`,
+      `Hola,\n\nLa familia de ${animal?.name ?? "uno de tus animales"} respondió el seguimiento de ${f.stage} ${f.stage === 1 ? "mes" : "meses"}.\n\nEntra a tu panel para verlo: ${sitioUrl()}/admin\n`
+    );
     return NextResponse.json({ ok: true });
   } catch (e) {
     if (e instanceof ErrorUsuario) return NextResponse.json({ error: e.message }, { status: 400 });
