@@ -13,10 +13,16 @@ const body = Nunito({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  title: "Huellitas HMO · Adopta y ayuda en Hermosillo",
+  title: "Huellitas HMO · Adopta, apadrina y ayuda en Hermosillo",
   description:
-    "Adopta, apadrina y dona en especie a los refugios de Hermosillo. Reporta mascotas perdidas o encontradas.",
-  openGraph: { siteName: "Huellitas HMO", locale: "es_MX", type: "website" },
+    "Animales en adopción, mascotas perdidas y encontradas, primeros auxilios y donativos en especie. Gratis y sin dinero de por medio.",
+  openGraph: {
+    siteName: "Huellitas HMO",
+    locale: "es_MX",
+    type: "website",
+    title: "Huellitas HMO · Adopta, apadrina y ayuda en Hermosillo",
+    description: "Animales en adopción, mascotas perdidas y encontradas, primeros auxilios y donativos en especie. Gratis y sin dinero de por medio.",
+  },
   twitter: { card: "summary_large_image" },
 };
 
