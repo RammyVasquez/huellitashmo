@@ -29,29 +29,79 @@ export default async function Home() {
     [s.auxiliados ?? 0, "animales auxiliados"],
   ];
 
+  // En la portada solo se muestran las cifras con resultados; en /impacto aparecen todas con su definición
+  const logros = items.filter(([n]) => n > 0);
+
   return (
     <>
       <div className="wrap hero">
         <div>
           <h1>Adoptar cambia dos vidas: la suya y la tuya.</h1>
           <p className="lead">
-            En los refugios de Hermosillo hay perros y gatos esperando una familia. Conócelos, adopta,
-            apadrina o ayuda con lo que tengas en casa. No necesitas dinero para hacer la diferencia.
+            <span className="solo-escritorio">
+              En los refugios de Hermosillo hay perros y gatos esperando una familia. Conócelos, adopta,
+              apadrina o ayuda con lo que tengas en casa. No necesitas dinero para hacer la diferencia.
+            </span>
+            <span className="solo-movil">Perros y gatos de Hermosillo esperan una familia. Conócelos y dale una segunda oportunidad.</span>
           </p>
           <div className="actions">
-            <Link className="btn" href="/animales">Conoce a quién espera</Link>
+            <Link className="btn" href="/animales">Ver animales</Link>
             <Link className="btn ghost" href="/match">Encuentra tu match</Link>
           </div>
+          <p className="confianza">Gratis · aquí no se maneja dinero</p>
         </div>
         {featured ? (
-          <Link href={`/animales/${featured.id}`} className="hero-photo" aria-label={`Conoce a ${featured.name}`}>
+          <Link href={`/animales/${featured.id}`} className="hero-photo solo-escritorio" aria-label={`Conoce a ${featured.name}`}>
             <FotoFit eager src={featured.photo_url!} alt={`Foto de ${featured.name}`} />
             <span className="hero-tag">Conoce a {featured.name}</span>
           </Link>
         ) : (
-          <div className="hero-photo"><div className="ph" /></div>
+          <div className="hero-photo solo-escritorio"><div className="ph" /></div>
         )}
       </div>
+
+      {/* Celular: carrusel para deslizar, justo después de la presentación */}
+      <div className="wrap solo-movil">
+        <section className="carrusel-sec" aria-label="Animales que buscan hogar">
+          <div className="section-head" style={{ marginBottom: ".6rem" }}>
+            <h2 style={{ fontSize: "1.5rem" }}>Buscan hogar</h2>
+            <Link href="/animales">Ver todos</Link>
+          </div>
+          {animals.length === 0 ? (
+            <div className="empty">Pronto compartiremos aquí a los animales de los refugios.</div>
+          ) : (
+            <div className="carrusel">
+              {animals.map((a, k) => (
+                <Link key={a.id} href={`/animales/${a.id}`} className="card carrusel-item">
+                  {a.photo_url ? <FotoFit eager={k === 0} src={a.photo_url} alt={`Foto de ${a.name}`} /> : <div className="ph" />}
+                  <div className="body">
+                    <h3>{a.name}</h3>
+                    <div>
+                      <span className="tag">{a.species}</span>
+                      {a.age_text && <span className="tag">{a.age_text}</span>}
+                      {a.sterilized && <span className="tag ok">esterilizado</span>}
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+
+      {logros.length >= 2 && (
+      <section className="impact" aria-label="Impacto de la plataforma">
+        <div className="wrap">
+          <h2>Lo que ya logramos juntos</h2>
+          <div className="stats">
+            {logros.map(([n, label]) => (
+              <div className="stat" key={label}><b>{n}</b><span>{label}</span></div>
+            ))}
+          </div>
+          <p style={{ margin: "1.2rem 0 0" }}><Link href="/impacto">Cómo contamos estas cifras</Link></p>
+        </div>
+      </section>
+      )}
 
       <div className="wrap">
         <section className="aux-band" aria-labelledby="aux-titulo">
@@ -65,18 +115,6 @@ export default async function Home() {
           <div><Link className="btn call" href="/primeros-auxilios">Ver todos los primeros auxilios</Link></div>
         </section>
       </div>
-
-      <section className="impact" aria-label="Impacto de la plataforma">
-        <div className="wrap">
-          <h2>Lo que ya logramos juntos</h2>
-          <div className="stats">
-            {items.map(([n, label]) => (
-              <div className="stat" key={label}><b>{n}</b><span>{label}</span></div>
-            ))}
-          </div>
-          <p style={{ margin: "1.2rem 0 0" }}><Link href="/impacto">Cómo contamos estas cifras</Link></p>
-        </div>
-      </section>
 
       <div className="wrap">
         <section className="section">
@@ -97,7 +135,7 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="section">
+        <section className="section solo-escritorio">
           <div className="section-head">
             <h2>Ellos buscan casa</h2>
             <Link href="/animales">Ver todos</Link>
