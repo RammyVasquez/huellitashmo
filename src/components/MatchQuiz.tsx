@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { recomendar, type Answers } from "@/lib/match";
 import type { Animal } from "@/lib/types";
+import FotoFit from "./FotoFit";
 
 type Opt = { value: string; label: string; text?: string };
 type Step = { id: "species" | "space" | "activity" | "convive" | "age"; title: string; multi?: boolean; options: Opt[] };
@@ -78,7 +79,7 @@ export default function MatchQuiz({ animals }: { animals: Animal[] }) {
             {results.map(({ animal: a, tier, reasons, missing }) => (
               <article className="card" key={a.id}>
                 <Link href={`/animales/${a.id}`} aria-label={`Conocer a ${a.name}`}>
-                  {a.photo_url ? <img src={a.photo_url} alt={`Foto de ${a.name}`} loading="lazy" /> : <div className="ph" />}
+                  {a.photo_url ? <FotoFit src={a.photo_url} alt={`Foto de ${a.name}`} /> : <div className="ph" />}
                 </Link>
                 <div className="body">
                   <span className={`tag ${tier === "Muy buena compatibilidad" ? "ok" : ""}`}>{tier}</span>

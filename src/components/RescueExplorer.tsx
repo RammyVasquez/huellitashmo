@@ -49,7 +49,7 @@ export default function RescueExplorer({ cases }: { cases: WelfarePublic[] }) {
               {c.status === "en_atencion" && <span className="tag ok">ya se está atendiendo</span>}
               <span className="tag">{CATEGORIAS[c.category].titulo}</span>
               <span className="tag">{c.species}</span>
-              <p>{c.description}</p>
+              <p className="clamp">{c.description}</p>
               <small className="muted">{c.zone} · {fechaCorta(c.created_at)}</small>
               <div className="actions" style={{ marginBottom: 0 }}>
                 {c.allow_contact && c.status === "activo" && <a className="btn" href={`/api/contacto-rescate/${c.id}`}>Quiero ayudar</a>}

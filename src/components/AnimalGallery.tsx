@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import FotoFit from "./FotoFit";
 
 export default function AnimalGallery({ photos, name }: { photos: string[]; name: string }) {
   const [i, setI] = useState(0);
@@ -7,7 +8,7 @@ export default function AnimalGallery({ photos, name }: { photos: string[]; name
   const actual = Math.min(i, photos.length - 1);
   return (
     <div className="galeria">
-      <img src={photos[actual]} alt={`Foto ${actual + 1} de ${photos.length} de ${name}`} />
+      <FotoFit className="grande" eager src={photos[actual]} alt={`Foto ${actual + 1} de ${photos.length} de ${name}`} />
       {photos.length > 1 && (
         <div className="mini" role="group" aria-label="Más fotos">
           {photos.map((u, k) => (

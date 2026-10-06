@@ -117,7 +117,7 @@ export default function ReportsExplorer({ reports }: { reports: PublicReport[] }
                   <span className={`tag ${r.kind}`}>{r.kind}</span>
                   <span className="tag">{r.species}</span>
                   {d != null && <span className="tag">{r.kind === "encontrado" ? "≈ " : ""}a {fmtKm(d)}</span>}
-                  <p>{r.description}</p>
+                  <p className="clamp">{r.description}</p>
                   <small className="muted">{r.zone} · {fechaCorta(r.created_at)}</small>
                   <div className="actions" style={{ marginBottom: 0 }}>
                     <a className="btn" href={`/api/contacto/${r.id}`}>Contactar por WhatsApp</a>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import AnimalCard from "@/components/AnimalCard";
+import FotoFit from "@/components/FotoFit";
 import { EMERGENCIAS } from "@/lib/primeros-auxilios";
 import type { Animal, ImpactStats } from "@/lib/types";
 
@@ -44,7 +45,7 @@ export default async function Home() {
         </div>
         {featured ? (
           <Link href={`/animales/${featured.id}`} className="hero-photo" aria-label={`Conoce a ${featured.name}`}>
-            <img src={featured.photo_url!} alt={`Foto de ${featured.name}`} />
+            <FotoFit eager src={featured.photo_url!} alt={`Foto de ${featured.name}`} />
             <span className="hero-tag">Conoce a {featured.name}</span>
           </Link>
         ) : (

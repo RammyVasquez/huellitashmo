@@ -423,3 +423,29 @@ ul.contactos { list-style: none; margin: 0; padding: 0; display: grid; gap: .6re
 .galeria .mini img { width: 68px; height: 68px; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: block; }
 .preview .foto-tag { position: absolute; left: .3rem; bottom: .3rem; background: var(--sol); color: var(--navy); font-size: .75rem; font-weight: 800; padding: .05rem .55rem; border-radius: 99px; }
 .preview .foto-principal { position: absolute; left: .3rem; right: .3rem; bottom: .3rem; background: rgba(255,255,255,.92); color: var(--navy); border: 0; border-radius: 8px; font: 700 .75rem var(--font-body), sans-serif; padding: .25rem; cursor: pointer; }
+
+/* ===== Tarjetas parejas y fotos completas ===== */
+div.foto-fit { position: relative; overflow: hidden; isolation: isolate; aspect-ratio: 4 / 3; background: var(--sky); }
+div.foto-fit::before { content: ""; position: absolute; inset: -12%; z-index: -1; background-image: var(--bg); background-size: cover; background-position: center; filter: blur(16px) saturate(1.1); opacity: .8; }
+div.foto-fit > img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: contain; border-radius: 0; background: transparent; display: block; }
+.card .ph { aspect-ratio: 4 / 3; }
+
+.grid { align-items: stretch; }
+.card { display: flex; flex-direction: column; }
+.card .body { display: flex; flex-direction: column; flex: 1; }
+.card .clamp { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.card .body .actions { margin: auto 0 0; padding-top: .9rem; display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.card .actions .btn { width: 100%; padding: .6rem .7rem; font-size: .93rem; }
+.card .actions .btn:first-child, .card .actions .btn:nth-child(2):last-child { grid-column: 1 / -1; }
+
+.strip div.foto-fit { flex: 0 0 100%; scroll-snap-align: start; }
+.hero-photo div.foto-fit { aspect-ratio: 4 / 5; border-radius: var(--radius); }
+.galeria div.foto-fit.grande { aspect-ratio: 4 / 5; border-radius: var(--radius); }
+
+@media (max-width: 760px) {
+  .grid .card div.foto-fit, .grid .card .ph { aspect-ratio: 1 / 1; }
+  .grid.reportes .card div.foto-fit, .grid.reportes .card .ph, .grid.match .card div.foto-fit, .grid.match .card .ph { aspect-ratio: 4 / 3; }
+  .card .clamp { -webkit-line-clamp: 3; }
+  .hero-photo div.foto-fit { aspect-ratio: 4 / 3; }
+  .galeria div.foto-fit.grande { aspect-ratio: 1 / 1; }
+}
