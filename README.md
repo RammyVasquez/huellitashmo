@@ -48,3 +48,15 @@ El panel tiene la pestaña “Rescates” y una lista editable de contactos de a
 - Telegram: habla con @BotFather (`/newbot`) y guarda el token; escríbele un mensaje a tu bot y abre
   `https://api.telegram.org/bot<TOKEN>/getUpdates` para leer tu `chat id`. Los avisos NO incluyen teléfonos ni el texto del reporte.
 - Después de desplegar y probar, corre `supabase/migracion-011-cerrar-escritura-publica.sql` para cerrar la escritura anónima.
+
+## Monitoreo y respaldos
+- `/api/health` responde 200 solo si el sitio y la base funcionan. Conéctalo a un monitor externo gratuito (p. ej. UptimeRobot)
+  con intervalo de 5 minutos: te avisa si se cae y, al consultar la base, evita que Supabase pause un proyecto sin actividad.
+- `vercel.json` programa `/api/cron/diario` (8:00 hora de Hermosillo): toca la base y manda un resumen de pendientes por Telegram.
+  Requiere la variable `CRON_SECRET`.
+- Panel → Respaldo: descarga todos los datos (JSON) y métricas sin datos personales (CSV). El panel avisa si pasan 7 días sin respaldo.
+
+## Adopciones
+Requiere `supabase/migracion-012-adopciones.sql`. Flujo: solicitud pública (`/animales/[id]/adoptar`) → panel Adopciones
+(etapas, avisos de compatibilidad, resumen para el refugio) → “Marcar adoptado” programa seguimientos a 1, 3 y 6 meses →
+la familia responde en `/seguimiento/[token]`.

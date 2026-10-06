@@ -28,6 +28,7 @@ export default async function Impacto() {
     [s.padrinos ?? 0, "padrinos"],
     [s.reunificaciones ?? 0, "familias reunidas"],
     [s.auxiliados ?? 0, "animales auxiliados"],
+    [s.seguimientos ?? 0, "seguimientos de adopción respondidos"],
   ];
 
   return (
@@ -66,6 +67,8 @@ export default async function Impacto() {
           <dd>Número de padrinos que reporta cada refugio por animal. Es un dato que ellos actualizan, no un conteo automático.</dd>
           <dt>Familias reunidas</dt>
           <dd>Reportes de mascotas perdidas o encontradas que el equipo administrador marcó como reunificados tras confirmarlo con las personas.</dd>
+          <dt>Seguimientos de adopción respondidos</dt>
+          <dd>Familias que, después de adoptar, respondieron la encuesta de seguimiento (a 1, 3 o 6 meses) contando cómo va la adaptación.</dd>
           <dt>Animales auxiliados</dt>
           <dd>Casos de animales heridos, enfermos o en riesgo que el equipo marcó como resueltos.</dd>
         </dl>

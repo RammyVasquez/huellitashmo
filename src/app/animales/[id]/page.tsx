@@ -64,7 +64,8 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
 
           {a.status !== "adoptado" && (
             <div className="actions">
-              {adoptar && <a className="btn" href={adoptar}>Quiero adoptar a {a.name}</a>}
+              <Link className="btn" href={`/animales/${a.id}/adoptar`}>Quiero adoptar a {a.name}</Link>
+              {adoptar && <a className="btn ghost" href={adoptar}>Prefiero escribir al refugio</a>}
               {a.sponsorable && apadrinar && <a className="btn alt" href={apadrinar}>Apadrinar en especie</a>}
             </div>
           )}

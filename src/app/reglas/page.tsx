@@ -7,7 +7,7 @@ export default function Reglas() {
   return (
     <div className="wrap page prose">
       <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Reglas de uso</h1>
-      <p className="updated">Última actualización: 2 de octubre de 2026</p>
+      <p className="updated">Última actualización: 3 de octubre de 2026</p>
       <p className="lead">Huellitas HMO existe para ayudar a animales de Hermosillo. Estas reglas protegen a los animales, a los refugios y a las personas que usan el sitio.</p>
 
       <h2>Qué es y qué no es</h2>
@@ -31,6 +31,7 @@ export default function Reglas() {
       <h2>Adopciones, apadrinamientos y donativos</h2>
       <ul>
         <li>La decisión de entregar un animal en adopción es del <b>refugio</b>, que puede pedir requisitos propios.</li>
+        <li>Enviar una solicitud de adopción <b>no garantiza</b> la adopción: el refugio evalúa cada solicitud y puede pedir entrevista y visita al hogar.</li>
         <li>La plataforma <b>no cobra ni maneja dinero</b>. Los donativos y el apadrinamiento son en especie y se coordinan directo con el refugio.</li>
         <li>No es un espacio para vender animales.</li>
       </ul>

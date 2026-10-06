@@ -9,7 +9,7 @@ export default function Privacidad() {
   return (
     <div className="wrap page prose">
       <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Aviso de privacidad</h1>
-      <p className="updated">Última actualización: 2 de octubre de 2026</p>
+      <p className="updated">Última actualización: 3 de octubre de 2026</p>
       <p className="lead">
         Huellitas HMO recibe pocos datos personales y solo los usa para ayudar a animales. Aquí explicamos cuáles, para qué y quién los ve.
       </p>
@@ -25,6 +25,8 @@ export default function Privacidad() {
         <li><b>Reportes de mascotas perdidas o encontradas:</b> tipo, especie, descripción, colonia, ubicación en el mapa (opcional), fotos y tu número de WhatsApp. Sirven para publicar el caso y que quien reconozca al animal pueda contactarte.</li>
         <li><b>Reportes de animales heridos, enfermos o maltratados:</b> los mismos datos, con tu WhatsApp <b>opcional</b>. Sirven para que nuestro equipo los revise y los canalice con quien pueda ayudar.</li>
         <li><b>Datos de refugios:</b> nombre, logo, dirección, teléfono y redes, publicados con autorización del refugio.</li>
+        <li><b>Solicitudes de adopción:</b> nombre, WhatsApp, colonia y datos de tu hogar (tipo de vivienda, personas, niños, otros animales y experiencia). Se envían solo al equipo administrador y al refugio responsable del animal para evaluar tu solicitud. Nunca se publican.</li>
+        <li><b>Seguimiento después de la adopción:</b> si adoptas, podemos enviarte por WhatsApp una liga para que nos cuentes cómo va tu mascota y, si quieres, envíes fotos. Las fotos solo se usan en publicaciones o historias si lo autorizas expresamente.</li>
         <li><b>Administradores:</b> correo y contraseña, gestionados por el servicio de autenticación de Supabase.</li>
       </ul>
       <p>No pedimos cuentas a quienes visitan el sitio y no vendemos ni cedemos datos para publicidad.</p>
@@ -46,6 +48,7 @@ export default function Privacidad() {
         <li><b>Cloudflare Turnstile:</b> verificación anti-bots al enviar un reporte.</li>
         <li><b>Telegram y, en su caso, un servicio de correo:</b> avisan al administrador de que llegó un reporte. Los avisos <b>no incluyen teléfonos ni el texto del reporte</b>, solo el tipo, la especie y la zona.</li>
         <li><b>OpenStreetMap (mapas, Nominatim y Overpass):</b> muestran los mapas y buscan direcciones. Cuando buscas una dirección, el texto que escribes se envía a estos servicios.</li>
+        <li><b>El refugio responsable del animal</b> que quieres adoptar recibe los datos de tu solicitud para evaluarla.</li>
         <li><b>WhatsApp:</b> cuando pulsas un botón para escribir a alguien, tu conversación se rige por las condiciones de WhatsApp.</li>
         <li><b>Facebook:</b> solo si pulsas “Ver sus publicaciones” en el perfil de un refugio; no se carga nada de Facebook antes.</li>
         <li><b>Panel de administración:</b> la comparación de fotos corre en el navegador del administrador. La librería y el modelo se descargan de jsDelivr y Hugging Face; las fotos no se envían a ningún servicio de inteligencia artificial.</li>

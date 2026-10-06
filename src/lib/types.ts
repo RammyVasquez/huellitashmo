@@ -67,6 +67,7 @@ export type ImpactStats = {
   esterilizados: number;
   padrinos: number;
   auxiliados?: number;
+  seguimientos?: number;
 };
 
 export type AdminReport = {
@@ -126,4 +127,45 @@ export const CATEGORIAS: Record<WelfareCategory, { titulo: string; texto: string
   maltrato: { titulo: "Maltrato o crueldad", texto: "Golpes, abuso o violencia", publica: false },
   abandono_encierro: { titulo: "Abandono o encierro", texto: "Encadenado, sin agua ni sombra", publica: false },
   otro: { titulo: "Otra situación de riesgo", texto: "Atrapado, en peligro u otra", publica: false },
+};
+
+export type AdoptionRequest = {
+  id: string;
+  animal_id: string;
+  applicant_name: string;
+  whatsapp: string;
+  colonia: string;
+  housing: "casa_patio" | "casa_sin_patio" | "departamento" | "otro";
+  tenure: "propia" | "renta";
+  landlord_ok: boolean | null;
+  household_size: number;
+  has_kids: boolean;
+  has_pets: boolean;
+  pets_note: string | null;
+  experience: string | null;
+  away_plan: string | null;
+  motivation: string;
+  agrees_visit: boolean;
+  agrees_commitment: boolean;
+  status: "nueva" | "contactado" | "entrevista" | "visita" | "aprobada" | "rechazada" | "adoptado" | "cancelada";
+  admin_notes: string | null;
+  adopted_at: string | null;
+  created_at: string;
+  animals: Pick<Animal, "name" | "photo_url" | "species" | "shelter_id" | "status" | "good_kids" | "good_pets" | "size" | "energy"> | null;
+};
+
+export type Followup = {
+  id: string;
+  request_id: string;
+  token: string;
+  stage: 1 | 3 | 6;
+  due_date: string;
+  status: "pendiente" | "enviado" | "respondido" | "omitido";
+  sent_at: string | null;
+  answered_at: string | null;
+  adapted: "muy_bien" | "bien" | "con_dificultades" | null;
+  notes: string | null;
+  photos: string[] | null;
+  photo_consent: boolean;
+  adoption_requests: { applicant_name: string; whatsapp: string; animals: { name: string } | null } | null;
 };

@@ -49,9 +49,9 @@ const esJpeg = (b: Buffer) => b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && 
 const esPng = (b: Buffer) => b.length > 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47;
 
 // Sube las fotos con la llave de servidor, validando tipo real, peso y cantidad
-export async function subirFotos(fd: FormData): Promise<string[]> {
+export async function subirFotos(fd: FormData, carpeta = "reportes", max = 5): Promise<string[]> {
   const files = fd.getAll("fotos").filter((f): f is File => typeof f !== "string" && f.size > 0);
-  if (files.length > 5) throw new ErrorUsuario("Máximo 5 fotos.");
+  if (files.length > max) throw new ErrorUsuario(`Máximo ${max} fotos.`);
   const db = supabaseAdmin();
   const urls: string[] = [];
   for (const f of files) {
@@ -59,7 +59,7 @@ export async function subirFotos(fd: FormData): Promise<string[]> {
     const buf = Buffer.from(await f.arrayBuffer());
     const jpeg = esJpeg(buf);
     if (!jpeg && !esPng(buf)) throw new ErrorUsuario("Solo se aceptan fotos JPG o PNG.");
-    const path = `reportes/${crypto.randomUUID()}.${jpeg ? "jpg" : "png"}`;
+    const path = `${carpeta}/${crypto.randomUUID()}.${jpeg ? "jpg" : "png"}`;
     const { error } = await db.storage.from("fotos").upload(path, buf, { contentType: jpeg ? "image/jpeg" : "image/png" });
     if (error) throw error;
     urls.push(db.storage.from("fotos").getPublicUrl(path).data.publicUrl);

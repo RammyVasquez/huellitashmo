@@ -66,3 +66,10 @@ export async function avisarAdmin(
 }
 
 export const sitioUrl = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
+
+// Avisa que algo falló de forma inesperada (nunca incluye datos de la persona)
+export async function avisarError(ruta: string) {
+  try {
+    await avisarAdmin("⚠️ Falló un formulario del sitio", [`Ruta: ${ruta}`, "Revisa los registros (Logs) en Vercel."], `${sitioUrl()}/admin`);
+  } catch { /* nunca debe impedir responder a la persona */ }
+}

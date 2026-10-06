@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { avisarAdmin, sitioUrl } from "@/lib/server/notify";
+import { avisarAdmin, avisarError, sitioUrl } from "@/lib/server/notify";
 import { coordenadas, ErrorUsuario, ESPECIES, ipDe, opcion, subirFotos, texto, verificarCaptcha } from "@/lib/server/intake";
 import { normalizeWa } from "@/lib/util";
 import { CATEGORIAS, type WelfareCategory } from "@/lib/types";
@@ -44,6 +44,7 @@ export async function POST(req: Request) {
   } catch (e) {
     if (e instanceof ErrorUsuario) return NextResponse.json({ error: e.message }, { status: 400 });
     console.error("api/rescate", e);
+    await avisarError("/api/rescate");
     return NextResponse.json({ error: "No pudimos guardar tu reporte. Si es urgente, busca ayuda directa. Intenta de nuevo en unos minutos." }, { status: 500 });
   }
 }
