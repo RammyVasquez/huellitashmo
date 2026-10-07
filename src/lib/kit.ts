@@ -71,3 +71,10 @@ export function textoKit(a: Animal, refugio: string | null, url: string): string
 
 export const nombreArchivo = (nombre: string) =>
   `huellitas-${nombre.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "animal"}`;
+
+// Frase de la imagen: concuerda con el sexo del animal ("Adóptala" / "Adóptalo")
+export function ctaKit(a: Animal): string {
+  if (a.status === "adoptado") return "Conoce a quienes aún esperan";
+  if (a.status === "en_cuidados") return "Ayúdale a recuperarse";
+  return a.sex === "hembra" ? "Adóptala" : a.sex === "macho" ? "Adóptalo" : "Dale un hogar";
+}

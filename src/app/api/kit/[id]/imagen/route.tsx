@@ -1,7 +1,9 @@
 import { ImageResponse } from "next/og";
-import { etiquetasKit, nombreArchivo } from "@/lib/kit";
+import QRCode from "qrcode";
+import { ctaKit, etiquetasKit, nombreArchivo } from "@/lib/kit";
 import { TarjetaKit } from "@/lib/kit-tarjeta";
-import { comoDataUri } from "@/lib/server/foto";
+import { fuenteGoogle } from "@/lib/server/fuente";
+import { fotoConMedidas } from "@/lib/server/foto";
 import { supabase } from "@/lib/supabase";
 import type { Animal } from "@/lib/types";
 
@@ -20,15 +22,21 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     const { data: sh } = await supabase.from("shelters").select("name").eq("id", a.shelter_id).maybeSingle();
     refugio = sh?.name ?? null;
   }
+  const sitio = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const url = a.photos?.[0] ?? a.photo_url;
-  const foto = url ? await comoDataUri(url) : null;
+  const [foto, qr, fuente] = await Promise.all([
+    url ? fotoConMedidas(url) : Promise.resolve(null),
+    QRCode.toDataURL(`${sitio}/animales/${a.id}?ref=kit`, { margin: 1, width: 320, errorCorrectionLevel: "M" }).catch(() => null),
+    fuenteGoogle("Fredoka", 600, `${a.name}Huellitas HMO BUSCA HOGAR EN CUIDADOS YA TIENE HOGAR`),
+  ]);
 
   const descargar = new URL(req.url).searchParams.get("descargar") === "1";
   return new ImageResponse(
-    <TarjetaKit d={{ nombre: a.name, foto, etiquetas: etiquetasKit(a), refugio, estado: a.status === "adoptado" ? "adoptado" : a.status === "en_cuidados" ? "en_cuidados" : "disponible" }} />,
+    <TarjetaKit d={{ nombre: a.name, foto, etiquetas: etiquetasKit(a), refugio, estado: a.status === "adoptado" ? "adoptado" : a.status === "en_cuidados" ? "en_cuidados" : "disponible", cta: ctaKit(a), qr }} />,
     {
       width: 1080,
       height: 1080,
+      fonts: fuente ? [{ name: "Fredoka", data: fuente, weight: 600, style: "normal" }] : undefined,
       headers: {
         "Cache-Control": "public, max-age=300",
         ...(descargar ? { "Content-Disposition": `attachment; filename="${nombreArchivo(a.name)}.png"` } : {}),
