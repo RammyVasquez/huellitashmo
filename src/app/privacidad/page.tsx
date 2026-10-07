@@ -26,6 +26,7 @@ export default function Privacidad() {
         <li><b>Reportes de animales heridos, enfermos o maltratados:</b> los mismos datos, con tu WhatsApp <b>opcional</b>. Sirven para que nuestro equipo los revise y los canalice con quien pueda ayudar.</li>
         <li><b>Datos de refugios:</b> nombre, logo, dirección, teléfono y redes, publicados con autorización del refugio.</li>
         <li><b>Solicitudes de adopción:</b> nombre, WhatsApp, colonia y datos de tu hogar (tipo de vivienda, personas, niños, otros animales y experiencia). Se envían solo al equipo administrador y al refugio responsable del animal para evaluar tu solicitud. Nunca se publican.</li>
+        <li><b>Historias “Encontró hogar”:</b> solo se publican con la autorización de la familia y de la forma en que la dé (con o sin su nombre). Puedes pedir que se retire en cualquier momento.</li>
         <li><b>Seguimiento después de la adopción:</b> si adoptas, podemos enviarte por WhatsApp una liga para que nos cuentes cómo va tu mascota y, si quieres, envíes fotos. Las fotos solo se usan en publicaciones o historias si lo autorizas expresamente.</li>
         <li><b>Personal autorizado (administradores, moderadores y personal de refugios):</b> correo y contraseña, gestionados por el servicio de autenticación de Supabase. Cada persona solo accede a lo que le corresponde: por ejemplo, el personal de un refugio solo ve los animales de su refugio y las solicitudes de adopción de esos animales.</li>
       </ul>

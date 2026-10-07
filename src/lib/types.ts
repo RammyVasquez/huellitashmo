@@ -72,6 +72,8 @@ export type ImpactStats = {
   padrinos: number;
   auxiliados?: number;
   seguimientos?: number;
+  eventos?: number;
+  historias?: number;
 };
 
 export type AdminReport = {
@@ -172,4 +174,59 @@ export type Followup = {
   photos: string[] | null;
   photo_consent: boolean;
   adoption_requests: { applicant_name: string; whatsapp: string; animals: { name: string } | null } | null;
+};
+
+export type MesImpacto = {
+  mes: string;               // YYYY-MM-DD (primer día del mes)
+  reportes: number;
+  reunificaciones: number;
+  rescates: number;
+  auxiliados: number;
+  animales_registrados: number;
+  adopciones: number;
+  solicitudes: number;
+  seguimientos: number;
+};
+
+export type Story = {
+  id: string;
+  animal_id: string | null;
+  shelter_id: string;
+  followup_id: string | null;
+  title: string;
+  body: string;
+  family_label: string | null;
+  photos: string[] | null;
+  consent_basis: "seguimiento" | "manual";
+  consent_note: string | null;
+  status: "borrador" | "publicada";
+  published_at: string | null;
+  created_at: string;
+};
+
+export type EventKind = "adopcion" | "esterilizacion" | "acopio" | "otro";
+export type EventRow = {
+  id: string;
+  shelter_id: string | null;
+  title: string;
+  kind: EventKind;
+  description: string | null;
+  starts_at: string;
+  ends_at: string | null;
+  place: string | null;
+  address: string | null;
+  status: "programado" | "realizado" | "cancelado";
+  attendees: number | null;
+  adoptions_count: number | null;
+  sterilizations_count: number | null;
+  results_note: string | null;
+  photos: string[] | null;
+  created_at: string;
+};
+
+export const TIPOS_EVENTO: Record<EventKind, string> = {
+  adopcion: "Jornada de adopción",
+  esterilizacion: "Jornada de esterilización",
+  acopio: "Acopio de donativos",
+  otro: "Evento",
 };

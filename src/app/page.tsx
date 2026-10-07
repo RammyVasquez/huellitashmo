@@ -4,15 +4,19 @@ import AnimalCard from "@/components/AnimalCard";
 import FotoFit from "@/components/FotoFit";
 import HeroRotator from "@/components/HeroRotator";
 import { EMERGENCIAS } from "@/lib/primeros-auxilios";
-import type { Animal, ImpactStats } from "@/lib/types";
+import { TIPOS_EVENTO, type Animal, type EventRow, type ImpactStats, type Story } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const [{ data: st }, { data: an }] = await Promise.all([
+  const [{ data: st }, { data: an }, { data: hs }, { data: ev }] = await Promise.all([
     supabase.from("impact_stats").select("*").single(),
     supabase.from("animals").select("*").neq("status", "adoptado").order("created_at", { ascending: false }).limit(8),
+    supabase.from("stories").select("*").eq("status", "publicada").order("published_at", { ascending: false }).limit(3),
+    supabase.from("events").select("*").eq("status", "programado").gte("starts_at", new Date(Date.now() - 6 * 3600 * 1000).toISOString()).order("starts_at").limit(2),
   ]);
+  const historias = (hs ?? []) as Story[];
+  const proximos = (ev ?? []) as EventRow[];
   const s = (st ?? {
     reportes: 0, reunificaciones: 0, animales_registrados: 0,
     adopciones: 0, esterilizados: 0, padrinos: 0, auxiliados: 0,
@@ -111,6 +115,24 @@ export default async function Home() {
       </div>
 
       <div className="wrap">
+        {proximos.length > 0 && (
+          <section className="section" aria-labelledby="ev-titulo">
+            <div className="section-head"><h2 id="ev-titulo">Próximos eventos</h2><Link href="/eventos">Ver todos</Link></div>
+            <div className="grid reportes">
+              {proximos.map((e) => (
+                <Link key={e.id} href="/eventos" className="card">
+                  <div className="body">
+                    <span className="tag">{TIPOS_EVENTO[e.kind]}</span>
+                    <h3>{e.title}</h3>
+                    <p style={{ margin: 0 }}><b>{new Date(e.starts_at).toLocaleString("es-MX", { timeZone: "America/Hermosillo", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</b></p>
+                    {e.place && <p className="muted" style={{ margin: ".2rem 0 0" }}>{e.place}</p>}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="section">
           <h2>Así cambia una vida</h2>
           <div className="three">
@@ -128,6 +150,23 @@ export default async function Home() {
             </div>
           </div>
         </section>
+
+        {historias.length > 0 && (
+          <section className="section" aria-labelledby="hist-titulo">
+            <div className="section-head"><h2 id="hist-titulo">Ya encontraron hogar</h2><Link href="/historias">Ver todas</Link></div>
+            <div className="grid">
+              {historias.map((h) => (
+                <Link key={h.id} href={`/historias/${h.id}`} className="card">
+                  {h.photos?.[0] ? <FotoFit src={h.photos[0]} alt={h.title} /> : <div className="ph" />}
+                  <div className="body">
+                    <h3>{h.title}</h3>
+                    <p className="clamp muted" style={{ margin: 0 }}>{h.body}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="section solo-escritorio">
           <div className="section-head">

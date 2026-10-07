@@ -487,3 +487,16 @@ div.foto-fit > img { position: absolute; inset: 0; width: 100%; height: 100%; as
 .hero-dots button span { width: 10px; height: 10px; border-radius: 50%; background: var(--line); transition: background .2s, transform .2s; }
 .hero-dots button[aria-pressed="true"] span { background: var(--navy); transform: scale(1.3); }
 @media (prefers-reduced-motion: reduce) { .hero-slide { transition: none; } }
+
+/* Gráficas de impacto */
+.graficas { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.2rem; margin-top: 1rem; }
+.grafica { margin: 0; background: var(--white); border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); padding: 1rem 1.1rem 1.2rem; }
+.grafica figcaption { margin-bottom: .6rem; }
+.grafica svg { width: 100%; height: auto; display: block; }
+.grafica .vacio { margin: 2.4rem 0; text-align: center; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Kit para compartir */
+.kit { display: grid; grid-template-columns: minmax(0, 540px) minmax(0, 1fr); gap: 2rem; align-items: start; margin-top: 1.4rem; }
+.kit-img { width: 100%; height: auto; aspect-ratio: 1 / 1; border-radius: var(--radius); box-shadow: 0 0 0 1px var(--line); background: var(--sky); display: block; }
+@media (max-width: 860px) { .kit { grid-template-columns: 1fr; } }

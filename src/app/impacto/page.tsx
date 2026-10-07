@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Contacto from "@/components/Contacto";
+import MesBars from "@/components/MesBars";
 import { supabase } from "@/lib/supabase";
-import type { ImpactStats } from "@/lib/types";
+import { TIPOS_EVENTO, type EventRow, type ImpactStats, type MesImpacto } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Impacto y transparencia · Huellitas HMO" };
@@ -12,13 +13,17 @@ const fecha = (d: Date, conHora = false) =>
   d.toLocaleString("es-MX", { timeZone: "America/Hermosillo", day: "numeric", month: "long", year: "numeric", ...(conHora ? { hour: "2-digit", minute: "2-digit" } : {}) });
 
 export default async function Impacto() {
-  const [{ data: st }, { data: sh }, { data: primero }] = await Promise.all([
+  const [{ data: st }, { data: sh }, { data: primero }, { data: ms }, { data: ev }] = await Promise.all([
     supabase.from("impact_stats").select("*").single(),
     supabase.from("shelters").select("id, name, logo_url").order("name"),
     supabase.from("animals").select("created_at").order("created_at", { ascending: true }).limit(1),
+    supabase.from("impact_by_month").select("*").order("mes"),
+    supabase.from("events").select("*").eq("status", "realizado").order("starts_at", { ascending: false }).limit(6),
   ]);
   const s = (st ?? {}) as Partial<ImpactStats>;
   const shelters = (sh ?? []) as ShelterRow[];
+  const meses = (ms ?? []) as MesImpacto[];
+  const eventos = (ev ?? []) as EventRow[];
   const desde = primero?.[0]?.created_at ? new Date(primero[0].created_at) : null;
 
   const cifras: [number, string][] = [
@@ -29,6 +34,8 @@ export default async function Impacto() {
     [s.reunificaciones ?? 0, "familias reunidas"],
     [s.auxiliados ?? 0, "animales auxiliados"],
     [s.seguimientos ?? 0, "seguimientos de adopción respondidos"],
+    [s.eventos ?? 0, "eventos realizados"],
+    [s.historias ?? 0, "historias publicadas"],
   ];
 
   return (
@@ -53,6 +60,48 @@ export default async function Impacto() {
         </div>
       </section>
 
+      <div className="wrap">
+        <section className="section">
+          <div className="section-head">
+            <h2>Actividad por mes</h2>
+            <a className="btn" href="/api/informe">Descargar informe en PDF</a>
+          </div>
+          <p className="muted" style={{ maxWidth: "62ch" }}>Últimos 12 meses, calculados a partir de los registros de la plataforma.</p>
+          <div className="graficas">
+            <MesBars titulo="Reportes de mascotas perdidas y encontradas" meses={meses.map((m) => m.mes)} valores={meses.map((m) => m.reportes)} />
+            <MesBars titulo="Adopciones" meses={meses.map((m) => m.mes)} valores={meses.map((m) => m.adopciones)} />
+            <MesBars titulo="Animales auxiliados (rescates resueltos)" meses={meses.map((m) => m.mes)} valores={meses.map((m) => m.auxiliados)} />
+            <MesBars titulo="Animales registrados" meses={meses.map((m) => m.mes)} valores={meses.map((m) => m.animales_registrados)} />
+          </div>
+        </section>
+
+        {eventos.length > 0 && (
+          <section className="section">
+            <h2>Eventos y jornadas realizados</h2>
+            <div className="grid" style={{ marginTop: ".8rem" }}>
+              {eventos.map((e) => (
+                <div className="card" key={e.id}>
+                  <div className="body">
+                    <span className="tag">{TIPOS_EVENTO[e.kind]}</span>
+                    <h3>{e.title}</h3>
+                    <p className="muted">{fecha(new Date(e.starts_at))}</p>
+                    <p style={{ margin: 0 }}>
+                      {[
+                        e.attendees != null ? `${e.attendees} asistentes` : "",
+                        e.adoptions_count != null ? `${e.adoptions_count} adopciones` : "",
+                        e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones` : "",
+                      ].filter(Boolean).join(" · ")}
+                    </p>
+                    {e.results_note && <p className="muted">{e.results_note}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p><Link href="/eventos">Ver todos los eventos</Link></p>
+          </section>
+        )}
+      </div>
+
       <div className="wrap prose">
         <h2>Cómo contamos cada cifra</h2>
         <p>Preferimos explicar con exactitud qué significa cada número para que nadie se confunda.</p>
@@ -71,6 +120,10 @@ export default async function Impacto() {
           <dd>Familias que, después de adoptar, respondieron la encuesta de seguimiento (a 1, 3 o 6 meses) contando cómo va la adaptación.</dd>
           <dt>Animales auxiliados</dt>
           <dd>Casos de animales heridos, enfermos o en riesgo que el equipo marcó como resueltos.</dd>
+          <dt>Eventos realizados</dt>
+          <dd>Jornadas de adopción, esterilización o acopio que un refugio o el equipo marcó como realizadas. Las cifras de cada evento (asistentes, adopciones, esterilizaciones) las captura quien lo organizó.</dd>
+          <dt>Historias publicadas</dt>
+          <dd>Historias de adopción publicadas en el sitio con la autorización de la familia.</dd>
         </dl>
 
         <h2>Cómo cuidamos la calidad de los datos</h2>

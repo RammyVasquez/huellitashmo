@@ -77,3 +77,10 @@ el refugio recibe un correo SIN datos personales de las familias, con una liga a
 
 ## Importar animales desde Excel
 Panel → Animales → “Importar varios animales desde Excel o CSV”. Plantilla descargable, vista previa con errores y duplicados, hasta 300 filas.
+
+## Impacto, historias, eventos y kit para compartir
+Requiere `supabase/migracion-017-impacto-historias-eventos.sql` y `npm install` (agrega `pdf-lib`).
+- `/impacto`: gráficas por mes (vista `impact_by_month`, solo conteos) y botón “Descargar informe en PDF” (`/api/informe`).
+- `/historias`: historias “Encontró hogar”; solo se publican con autorización de la familia (del seguimiento o registrada a mano).
+- `/eventos`: jornadas de adopción, esterilización y acopio; al marcarse “realizado” se capturan los resultados, que alimentan Impacto.
+- `/animales/[id]/kit`: imagen cuadrada (`/api/kit/[id]/imagen`) y texto listos para publicar.

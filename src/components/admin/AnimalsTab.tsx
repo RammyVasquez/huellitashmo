@@ -189,6 +189,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
             {a.sponsorable && <span className="tag">apadrinable · {a.sponsors}</span>}
           </div>
           <div className="row-actions">
+            <a className="btn ghost" href={`/animales/${a.id}/kit`} target="_blank" rel="noopener noreferrer">Kit para compartir</a>
             <button className="btn ghost" onClick={() => { setEditing(a); setFotos(fotosDe(a)); setNuevas([]); setFormKey((k) => k + 1); window.scrollTo({ top: 0 }); }}>Editar</button>
             {a.status !== "adoptado" && <button className="btn alt" onClick={() => marcarAdoptado(a)}>Marcar adoptado</button>}
           </div>

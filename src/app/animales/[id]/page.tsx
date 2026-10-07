@@ -86,6 +86,7 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
           )}
 
           <ShareButtons text={a.status === "adoptado" ? `${a.name} ya encontró hogar` : `${a.name} busca hogar en Hermosillo`} />
+          <p><Link href={`/animales/${a.id}/kit`}>Descargar imagen y texto para compartir</Link></p>
         </div>
       </div>
     </div>

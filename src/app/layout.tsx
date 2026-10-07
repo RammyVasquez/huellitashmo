@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/adopta">Cómo adoptar</Link> · <Link href="/match">Encuentra tu match</Link> · <Link href="/rescate">Animales heridos o maltratados</Link> · <Link href="/primeros-auxilios">Primeros auxilios</Link>
             </p>
             <p>
-              <Link href="/impacto">Impacto</Link> · <Link href="/privacidad">Privacidad</Link> · <Link href="/reglas">Reglas de uso</Link>
+              <Link href="/historias">Historias</Link> · <Link href="/eventos">Eventos</Link> · <Link href="/impacto">Impacto</Link> · <Link href="/privacidad">Privacidad</Link> · <Link href="/reglas">Reglas de uso</Link>
               {process.env.NEXT_PUBLIC_CONTACT_EMAIL && <> · <Contacto prefijo="Contacto:" /></>}
             </p>
             <p className="footer-admin"><Link href="/admin">Acceso para administradores</Link></p>
