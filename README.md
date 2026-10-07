@@ -93,3 +93,6 @@ Requiere `supabase/migracion-018-visitas-cuidados-recuperacion.sql`.
 - App instalable: `manifest.ts` e íconos en `public/icons` y `src/app`.
 - Recuperar contraseña: `/admin/recuperar` envía un enlace por correo (Gmail) y `/admin/restablecer` guarda la contraseña nueva.
   En Supabase → Authentication → URL Configuration: Site URL `https://huellitashmo.site` y agrega `https://huellitashmo.site/admin/restablecer` a Redirect URLs.
+
+## Registro de padrinos
+Requiere `supabase/migracion-019-padrinos.sql`. Cada apadrinamiento se anota en Panel → Padrinos (nombre o apodo, qué cubre, desde cuándo, contacto opcional). El número de padrinos de cada animal (vigentes) se calcula con un disparador en la base y la cifra “padrinos” de Impacto cuenta todos los registros. Los nombres y contactos son privados.

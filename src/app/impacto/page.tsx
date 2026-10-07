@@ -113,7 +113,7 @@ export default async function Impacto() {
           <dt>Animales esterilizados o castrados</dt>
           <dd>Animales registrados con el dato de “esterilizado o castrado”. Indica su estado, no necesariamente que la esterilización o castración se haya hecho gracias a la plataforma.</dd>
           <dt>Padrinos</dt>
-          <dd>Número de padrinos que reporta cada refugio por animal. Es un dato que ellos actualizan, no un conteo automático.</dd>
+          <dd>Apadrinamientos en especie que los refugios registraron, con la fecha y lo que cubre cada uno (vigentes y terminados). Se cuentan solos a partir de ese registro; los nombres de las personas no se publican.</dd>
           <dt>Familias reunidas</dt>
           <dd>Reportes de mascotas perdidas o encontradas que el equipo administrador marcó como reunificados tras confirmarlo con las personas.</dd>
           <dt>Seguimientos de adopción respondidos</dt>

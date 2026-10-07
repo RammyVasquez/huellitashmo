@@ -230,3 +230,16 @@ export const TIPOS_EVENTO: Record<EventKind, string> = {
   acopio: "Acopio de donativos",
   otro: "Evento",
 };
+
+export type Sponsorship = {
+  id: string;
+  animal_id: string;
+  shelter_id: string;
+  sponsor_name: string;
+  contact: string | null;
+  support: string;
+  started_on: string;
+  ended_on: string | null;
+  note: string | null;
+  created_at: string;
+};

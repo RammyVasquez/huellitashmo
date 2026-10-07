@@ -7,6 +7,7 @@ import AnimalsTab from "./AnimalsTab";
 import NeedsTab from "./NeedsTab";
 import SheltersTab from "./SheltersTab";
 import StoriesTab from "./StoriesTab";
+import SponsorsTab from "./SponsorsTab";
 import EventsTab from "./EventsTab";
 import WelfareTab from "./WelfareTab";
 import AdoptionsTab from "./AdoptionsTab";
@@ -16,16 +17,16 @@ import AccountTab from "./AccountTab";
 
 type Rol = "admin" | "moderador" | "refugio";
 type Acceso = { role: Rol; shelter_id?: string | null };
-type Tab = "reportes" | "rescates" | "adopciones" | "animales" | "necesidades" | "refugios" | "historias" | "eventos" | "equipo" | "respaldo" | "cuenta";
+type Tab = "reportes" | "rescates" | "adopciones" | "animales" | "necesidades" | "padrinos" | "refugios" | "historias" | "eventos" | "equipo" | "respaldo" | "cuenta";
 
 // Cada tipo de acceso ve solo sus pestañas (la base de datos además lo exige por su cuenta)
 const TABS_POR_ROL: Record<Rol, Tab[]> = {
-  admin: ["reportes", "rescates", "adopciones", "animales", "necesidades", "refugios", "historias", "eventos", "equipo", "respaldo", "cuenta"],
+  admin: ["reportes", "rescates", "adopciones", "animales", "necesidades", "padrinos", "refugios", "historias", "eventos", "equipo", "respaldo", "cuenta"],
   moderador: ["reportes", "rescates", "cuenta"],
-  refugio: ["adopciones", "animales", "necesidades", "refugios", "historias", "eventos", "cuenta"],
+  refugio: ["adopciones", "animales", "necesidades", "padrinos", "refugios", "historias", "eventos", "cuenta"],
 };
 const ETIQUETA: Record<Tab, string> = {
-  reportes: "Reportes", rescates: "Rescates", adopciones: "Adopciones", animales: "Animales", necesidades: "Necesidades", historias: "Historias", eventos: "Eventos",
+  reportes: "Reportes", rescates: "Rescates", adopciones: "Adopciones", animales: "Animales", necesidades: "Necesidades", padrinos: "Padrinos", historias: "Historias", eventos: "Eventos",
   refugios: "Refugios", equipo: "Equipo", respaldo: "Respaldo", cuenta: "Mi cuenta",
 };
 
@@ -171,6 +172,7 @@ export default function AdminApp() {
       {actual === "adopciones" && <AdoptionsTab rol={rol} />}
       {actual === "animales" && <AnimalsTab shelterId={refugioId} />}
       {actual === "necesidades" && <NeedsTab shelterId={refugioId} />}
+      {actual === "padrinos" && <SponsorsTab shelterId={refugioId} />}
       {actual === "refugios" && <SheltersTab soloId={refugioId} />}
       {actual === "historias" && <StoriesTab shelterId={refugioId} />}
       {actual === "eventos" && <EventsTab shelterId={refugioId} />}

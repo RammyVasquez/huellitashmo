@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { errTexto } from "@/lib/util";
 import VisitsCard from "./VisitsCard";
 
-const TABLAS = ["shelters", "shelter_private", "animals", "shelter_needs", "reports", "welfare_reports", "help_contacts", "adoption_requests", "adoption_followups", "stories", "events", "visits_daily"];
+const TABLAS = ["shelters", "shelter_private", "animals", "shelter_needs", "reports", "welfare_reports", "help_contacts", "adoption_requests", "adoption_followups", "stories", "events", "sponsorships", "visits_daily"];
 type Fila = Record<string, unknown>;
 
 async function todo(tabla: string): Promise<Fila[]> {
@@ -71,7 +71,7 @@ export default function BackupTab() {
     setTrabajando(false);
   }
 
-  async function metricas(cual: "casos" | "animales" | "adopciones" | "visitas") {
+  async function metricas(cual: "casos" | "animales" | "adopciones" | "visitas" | "padrinos") {
     setTrabajando(true);
     setMsg(null);
     try {
@@ -88,6 +88,11 @@ export default function BackupTab() {
         const an = await todo("animals");
         bajar(`animales-${hoy}.csv`, csv(["especie", "estado", "esterilizado_castrado", "vacunado", "refugio", "fecha_alta", "fecha_adopcion"],
           an.map((a) => [String(a.species), String(a.status), a.sterilized ? "sí" : "no", a.vaccinated ? "sí" : "no", refugio(a.shelter_id), dia(a.created_at), dia(a.adopted_at)])), "text/csv");
+      } else if (cual === "padrinos") {
+        const [sp, an] = await Promise.all([todo("sponsorships"), todo("animals")]);
+        const animal = (id: unknown) => an.find((a) => a.id === id);
+        bajar(`padrinos-${hoy}.csv`, csv(["especie", "refugio", "que_cubre", "desde", "hasta", "estado"],
+          sp.map((s) => [String(animal(s.animal_id)?.species ?? ""), refugio(s.shelter_id), String(s.support), dia(s.started_on), dia(s.ended_on), s.ended_on ? "terminado" : "vigente"])), "text/csv");
       } else if (cual === "visitas") {
         const v = await todo("visits_daily");
         bajar(`visitas-${hoy}.csv`, csv(["dia", "origen", "visitas"], v.map((x) => [String(x.day), String(x.source), Number(x.visits)])), "text/csv");
@@ -119,6 +124,7 @@ export default function BackupTab() {
         <button className="btn ghost" disabled={trabajando} onClick={() => metricas("casos")}>Casos (CSV)</button>
         <button className="btn ghost" disabled={trabajando} onClick={() => metricas("animales")}>Animales (CSV)</button>
         <button className="btn ghost" disabled={trabajando} onClick={() => metricas("adopciones")}>Adopciones (CSV)</button>
+        <button className="btn ghost" disabled={trabajando} onClick={() => metricas("padrinos")}>Padrinos (CSV)</button>
         <button className="btn ghost" disabled={trabajando} onClick={() => metricas("visitas")}>Visitas por origen (CSV)</button>
       </div>
       {msg && <p className={msg.ok ? "ok" : "error"} role="status">{msg.text}</p>}

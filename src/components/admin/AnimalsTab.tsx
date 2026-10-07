@@ -58,7 +58,6 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
         sterilized: fd.get("sterilized") === "on",
         vaccinated: fd.get("vaccinated") === "on",
         sponsorable: fd.get("sponsorable") === "on",
-        sponsors: Number(fd.get("sponsors") || 0),
         adopted_at: status === "adoptado" ? editing?.status === "adoptado" ? undefined : new Date().toISOString() : null,
       };
       const q = editing
@@ -172,7 +171,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
         <label className="check"><input type="checkbox" name="sterilized" defaultChecked={editing?.sterilized} /> Esterilizado o castrado</label>
         <label className="check"><input type="checkbox" name="vaccinated" defaultChecked={editing?.vaccinated} /> Vacunado</label>
         <label className="check"><input type="checkbox" name="sponsorable" defaultChecked={editing?.sponsorable} /> Se puede apadrinar</label>
-        <label>Número de padrinos<input name="sponsors" type="number" min={0} defaultValue={editing?.sponsors ?? 0} /></label>
+        <p className="muted" style={{ margin: 0, fontSize: ".92rem" }}>Los padrinos se anotan en la pestaña <b>Padrinos</b>: ahí queda quién apadrina y qué cubre, y el número se calcula solo.</p>
         <div className="actions" style={{ margin: 0 }}>
           <button className="btn" disabled={guardando}>{guardando ? "Guardando…" : editing ? "Guardar cambios" : "Registrar animal"}</button>
           {editing && <button type="button" className="btn ghost" onClick={() => { setEditing(null); setFotos([]); setNuevas([]); setFormKey((k) => k + 1); }}>Cancelar</button>}

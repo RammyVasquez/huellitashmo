@@ -24,7 +24,7 @@ export const DEFINICIONES: [string, string][] = [
   ["Animales registrados", "Animales dados de alta en la plataforma por un refugio, estén o no disponibles."],
   ["Adopciones", "Animales que el refugio marcó como adoptados en su panel. Es el refugio quien lo confirma."],
   ["Esterilizados o castrados", "Animales registrados con el dato de esterilizado o castrado. Indica su estado, no que la esterilización se haya hecho gracias a la plataforma."],
-  ["Padrinos", "Número de padrinos que reporta cada refugio por animal. Lo actualizan ellos."],
+  ["Padrinos", "Apadrinamientos en especie registrados por los refugios, con fecha y lo que cubre (vigentes y terminados). Se cuentan solos desde ese registro."],
   ["Familias reunidas", "Reportes de mascotas perdidas o encontradas que el equipo marcó como reunificados tras confirmarlo con las personas."],
   ["Animales auxiliados", "Casos de animales heridos, enfermos o en riesgo que el equipo marcó como resueltos."],
   ["Seguimientos respondidos", "Familias que, después de adoptar, respondieron la encuesta de seguimiento a 1, 3 o 6 meses."],
