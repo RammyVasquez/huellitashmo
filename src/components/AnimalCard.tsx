@@ -13,6 +13,7 @@ export default function AnimalCard({ a }: { a: Animal }) {
           <span className="tag">{a.species}</span>
           {a.age_text && <span className="tag">{a.age_text}</span>}
           {a.sterilized && <span className="tag ok">{esteril(a.sex)}</span>}
+          {a.status === "en_cuidados" && <span className="tag urgente">en cuidados</span>}
         </div>
       </div>
     </Link>

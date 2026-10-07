@@ -54,6 +54,7 @@ function Login() {
         <button className="btn" disabled={cargando}>{cargando ? "Entrando…" : "Entrar"}</button>
         {error && <p className="error" role="alert">{error}</p>}
       </form>
+      <p><a href="/admin/recuperar">¿Olvidaste tu contraseña?</a></p>
     </>
   );
 }

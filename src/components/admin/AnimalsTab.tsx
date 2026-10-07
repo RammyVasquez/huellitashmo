@@ -165,6 +165,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
           <select name="status" defaultValue={editing?.status ?? "disponible"}>
             <option value="disponible">Disponible</option>
             <option value="en_proceso">Adopción en proceso</option>
+            <option value="en_cuidados">En cuidados (aún no se puede adoptar)</option>
             <option value="adoptado">Adoptado</option>
           </select>
         </label>

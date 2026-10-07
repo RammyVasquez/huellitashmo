@@ -41,6 +41,7 @@ export async function POST(req: Request) {
     const db = supabaseAdmin();
     const { data: animal } = await db.from("animals").select("id, name, status, shelter_id").eq("id", animalId).single();
     if (!animal || animal.status === "adoptado") throw new ErrorUsuario("Este animal ya no está disponible para adopción.");
+    if (animal.status === "en_cuidados") throw new ErrorUsuario("Este animal se está recuperando y todavía no se puede adoptar.");
 
     // Evita duplicados: misma persona y mismo animal en los últimos 7 días
     const hace7 = new Date(Date.now() - 7 * 864e5).toISOString();

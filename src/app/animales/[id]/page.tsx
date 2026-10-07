@@ -16,7 +16,7 @@ const ENERGIA = { tranquilo: "Tranquilo", moderado: "Energía moderada", activo:
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const a = await getAnimal(params.id);
   if (!a) return { title: "Animal no encontrado · Huellitas HMO" };
-  const title = a.status === "adoptado" ? `${a.name} ya encontró hogar` : `${a.name} busca hogar en Hermosillo`;
+  const title = a.status === "adoptado" ? `${a.name} ya encontró hogar` : a.status === "en_cuidados" ? `${a.name} se está recuperando` : `${a.name} busca hogar en Hermosillo`;
   const description = a.description?.slice(0, 160) ?? `Conoce a ${a.name} y ayúdalo a encontrar una familia.`;
   return {
     title: `${title} · Huellitas HMO`,
@@ -50,6 +50,7 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
             {a.sterilized && <span className="tag ok">{esteril(a.sex)}</span>}
             {a.vaccinated && <span className="tag ok">vacunado</span>}
             {a.status === "en_proceso" && <span className="tag urgente">adopción en proceso</span>}
+            {a.status === "en_cuidados" && <span className="tag urgente">en cuidados</span>}
             {a.status === "adoptado" && <span className="tag ok">¡ya encontró hogar!</span>}
           </p>
           {(a.age_group || a.size || a.energy || a.good_kids || a.good_pets) && (
@@ -65,14 +66,21 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
           )}
           {a.description && <p className="lead">{a.description}</p>}
 
-          {a.status !== "adoptado" && (
+          {a.status === "en_cuidados" && (
+            <div className="box">
+              <h3 style={{ marginTop: 0 }}>{a.name} se está recuperando</h3>
+              <p>Todavía no se puede adoptar.{a.sponsorable ? " Pero puedes ayudarle a salir adelante apadrinándolo en especie." : " Pronto compartiremos cómo va."}</p>
+              {a.sponsorable && apadrinar && <div className="actions" style={{ marginBottom: 0 }}><a className="btn alt" href={apadrinar}>Apadrinar en especie</a></div>}
+            </div>
+          )}
+          {a.status !== "adoptado" && a.status !== "en_cuidados" && (
             <div className="actions">
               <Link className="btn" href={`/animales/${a.id}/adoptar`}>Quiero adoptar a {a.name}</Link>
               {adoptar && <a className="btn ghost" href={adoptar}>Prefiero escribir al refugio</a>}
               {a.sponsorable && apadrinar && <a className="btn alt" href={apadrinar}>Apadrinar en especie</a>}
             </div>
           )}
-          {!shelter?.whatsapp && a.status !== "adoptado" && <p className="muted">Este refugio aún no registró un contacto por WhatsApp.</p>}
+          {!shelter?.whatsapp && a.status !== "adoptado" && a.status !== "en_cuidados" && <p className="muted">Este refugio aún no registró un contacto por WhatsApp.</p>}
           {a.sponsors > 0 && <p className="muted">{a.name} ya tiene {a.sponsors} {a.sponsors === 1 ? "padrino" : "padrinos"}.</p>}
 
           {shelter && (
@@ -86,7 +94,7 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
             </div>
           )}
 
-          <ShareButtons text={a.status === "adoptado" ? `${a.name} ya encontró hogar` : `${a.name} busca hogar en Hermosillo`} />
+          <ShareButtons text={a.status === "adoptado" ? `${a.name} ya encontró hogar` : a.status === "en_cuidados" ? `${a.name} se está recuperando y puedes ayudar` : `${a.name} busca hogar en Hermosillo`} />
           <p><Link href={`/animales/${a.id}/kit`}>Descargar imagen y texto para compartir</Link></p>
         </div>
       </div>

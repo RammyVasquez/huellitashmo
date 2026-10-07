@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
-  const fijas = ["", "/animales", "/refugios", "/donar", "/adopta", "/match", "/reportes", "/rescate", "/primeros-auxilios", "/impacto", "/historias", "/eventos", "/privacidad", "/reglas"];
+  const fijas = ["", "/animales", "/refugios", "/donar", "/adopta", "/match", "/reportes", "/rescate", "/primeros-auxilios", "/impacto", "/nosotros", "/historias", "/eventos", "/privacidad", "/reglas"];
   const [a, s, r, h] = await Promise.all([
     supabase.from("animals").select("id").neq("status", "adoptado"),
     supabase.from("shelters").select("id"),

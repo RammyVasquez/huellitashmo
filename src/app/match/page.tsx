@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 export const metadata = { title: "Encuentra tu match · Huellitas HMO" };
 
 export default async function Match() {
-  const { data } = await supabase.from("animals").select("*").neq("status", "adoptado").order("created_at", { ascending: false });
+  const { data } = await supabase.from("animals").select("*").in("status", ["disponible", "en_proceso"]).order("created_at", { ascending: false });
   const animals = (data ?? []) as Animal[];
 
   return (

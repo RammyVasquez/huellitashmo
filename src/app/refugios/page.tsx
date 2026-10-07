@@ -13,6 +13,7 @@ export default async function Refugios() {
     <div className="wrap page">
       <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Los refugios de Hermosillo</h1>
       <p className="lead">Personas que rescatan todos los días. Conócelos, sigue su trabajo y ayúdalos.</p>
+      <p className="muted">¿Cuidas animales en Hermosillo, con o sin refugio? <Link href="/nosotros#sumarte">Súmate a Huellitas HMO</Link>.</p>
       {shelters.length === 0 ? (
         <div className="empty">Pronto estarán aquí los refugios aliados.</div>
       ) : (

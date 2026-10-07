@@ -84,3 +84,12 @@ Requiere `supabase/migracion-017-impacto-historias-eventos.sql` y `npm install` 
 - `/historias`: historias “Encontró hogar”; solo se publican con autorización de la familia (del seguimiento o registrada a mano).
 - `/eventos`: jornadas de adopción, esterilización y acopio; al marcarse “realizado” se capturan los resultados, que alimentan Impacto.
 - `/animales/[id]/kit`: imagen cuadrada (`/api/kit/[id]/imagen`) y texto listos para publicar.
+
+## Quiénes somos, visitas por origen, "en cuidados", app instalable y recuperación de contraseña
+Requiere `supabase/migracion-018-visitas-cuidados-recuperacion.sql`.
+- `/nosotros`: quién está detrás, por qué es gratis y cómo sumarse. Muestra el correo de `NEXT_PUBLIC_CONTACT_EMAIL`.
+- Visitas por origen (sin cookies, sin IP): `VisitaCounter` suma una visita por sesión y fuente (`?ref=...` o sitio de procedencia). Se ven en Panel → Respaldo. Abre `/?nocontar=1` en tus dispositivos para no contarte.
+- Estado `en_cuidados`: el animal se muestra sin botón de adoptar (puede apadrinarse), no aparece en la portada ni en "Encuentra tu match" y el formulario de adopción lo rechaza.
+- App instalable: `manifest.ts` e íconos en `public/icons` y `src/app`.
+- Recuperar contraseña: `/admin/recuperar` envía un enlace por correo (Gmail) y `/admin/restablecer` guarda la contraseña nueva.
+  En Supabase → Authentication → URL Configuration: Site URL `https://huellitashmo.site` y agrega `https://huellitashmo.site/admin/restablecer` a Redirect URLs.

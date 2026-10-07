@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
   const descargar = new URL(req.url).searchParams.get("descargar") === "1";
   return new ImageResponse(
-    <TarjetaKit d={{ nombre: a.name, foto, etiquetas: etiquetasKit(a), refugio, adoptado: a.status === "adoptado" }} />,
+    <TarjetaKit d={{ nombre: a.name, foto, etiquetas: etiquetasKit(a), refugio, estado: a.status === "adoptado" ? "adoptado" : a.status === "en_cuidados" ? "en_cuidados" : "disponible" }} />,
     {
       width: 1080,
       height: 1080,

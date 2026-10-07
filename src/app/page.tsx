@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function Home() {
   const [{ data: st }, { data: an }, { data: hs }, { data: ev }] = await Promise.all([
     supabase.from("impact_stats").select("*").single(),
-    supabase.from("animals").select("*").neq("status", "adoptado").order("created_at", { ascending: false }).limit(8),
+    supabase.from("animals").select("*").in("status", ["disponible", "en_proceso"]).order("created_at", { ascending: false }).limit(8),
     supabase.from("stories").select("*").eq("status", "publicada").order("published_at", { ascending: false }).limit(3),
     supabase.from("events").select("*").eq("status", "programado").gte("starts_at", new Date(Date.now() - 6 * 3600 * 1000).toISOString()).order("starts_at").limit(2),
   ]);

@@ -1,5 +1,5 @@
 // Imagen cuadrada (1080x1080) para compartir a un animal en redes
-export type DatosKit = { nombre: string; foto: string | null; etiquetas: string[]; refugio: string | null; adoptado: boolean };
+export type DatosKit = { nombre: string; foto: string | null; etiquetas: string[]; refugio: string | null; estado: "disponible" | "en_cuidados" | "adoptado" };
 
 function Pata() {
   const dedos: [number, number][] = [[268, 178], [374, 96], [482, 96], [588, 178]];
@@ -21,8 +21,8 @@ export function TarjetaKit({ d }: { d: DatosKit }) {
       <div style={{ display: "flex", position: "absolute", top: 0, left: 0, width: 1080, height: 1080, background: "rgba(19,40,79,0.88)" }} />
       <div style={{ display: "flex", flexDirection: "column", position: "absolute", top: 0, left: 0, width: 1080, height: 1080, padding: 56 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", padding: "10px 28px", borderRadius: 40, background: d.adoptado ? "#2f9e6e" : "#ffc933", color: d.adoptado ? "#ffffff" : "#13284f", fontSize: 34, fontWeight: 700 }}>
-            {d.adoptado ? "YA TIENE HOGAR" : "BUSCA HOGAR"}
+          <div style={{ display: "flex", padding: "10px 28px", borderRadius: 40, background: d.estado === "adoptado" ? "#2f9e6e" : d.estado === "en_cuidados" ? "#8fb8ff" : "#ffc933", color: d.estado === "adoptado" ? "#ffffff" : "#13284f", fontSize: 34, fontWeight: 700 }}>
+            {d.estado === "adoptado" ? "YA TIENE HOGAR" : d.estado === "en_cuidados" ? "EN CUIDADOS" : "BUSCA HOGAR"}
           </div>
           <div style={{ display: "flex", fontSize: 34, fontWeight: 700 }}>Huellitas HMO</div>
         </div>
@@ -40,7 +40,7 @@ export function TarjetaKit({ d }: { d: DatosKit }) {
 
         <div style={{ display: "flex", flexDirection: "column", marginTop: "auto" }}>
           <div style={{ display: "flex", fontSize: 38, fontWeight: 700, color: "#ffc933" }}>
-            {d.adoptado ? "Conoce a quienes aún esperan: huellitashmo.site" : "Adóptalo en huellitashmo.site"}
+            {d.estado === "adoptado" ? "Conoce a quienes aún esperan: huellitashmo.site" : d.estado === "en_cuidados" ? "Ayúdalo a recuperarse: huellitashmo.site" : "Adóptalo en huellitashmo.site"}
           </div>
           {d.refugio && <div style={{ display: "flex", marginTop: 6, fontSize: 28, color: "#dbe5f7" }}>{d.refugio}</div>}
         </div>

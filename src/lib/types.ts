@@ -9,7 +9,7 @@ export type Animal = {
   age_text: string | null;
   description: string | null;
   photo_url: string | null;
-  status: "disponible" | "en_proceso" | "adoptado";
+  status: "disponible" | "en_proceso" | "en_cuidados" | "adoptado";
   sterilized: boolean;
   vaccinated: boolean;
   sponsorable: boolean;

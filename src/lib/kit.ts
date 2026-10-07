@@ -35,6 +35,19 @@ export function textoKit(a: Animal, refugio: string | null, url: string): string
   }
   const sexo = a.sex === "hembra" ? "Hembra" : a.sex === "macho" ? "Macho" : null;
   const especie = a.species === "perro" ? "Perro" : a.species === "gato" ? "Gato" : "Animal";
+  if (a.status === "en_cuidados") {
+    return [
+      `💛 ${a.name} se está recuperando en Hermosillo`,
+      [especie, a.age_text, sexo].filter(Boolean).join(" · "),
+      "",
+      `Todavía no se puede adoptar, pero ${a.sponsorable ? "puedes ayudarle apadrinándolo en especie" : "puedes seguir su historia"}.`,
+      corte(a.description, 200),
+      refugio ? `Lo cuida: ${refugio}` : "",
+      "",
+      `Conoce su historia y cómo ayudar: ${url}`,
+      "#Apadrina #Hermosillo #HuellitasHMO",
+    ].filter((l, i, arr) => !(l === "" && arr[i - 1] === "")).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  }
   const rasgos = [
     a.size && TAMANO[a.size],
     a.energy && ENERGIA[a.energy],

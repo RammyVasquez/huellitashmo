@@ -21,6 +21,18 @@ export default async function Adoptar({ params }: { params: { id: string } }) {
       </div>
     );
 
+  if (a.status === "en_cuidados")
+    return (
+      <div className="wrap page">
+        <h1>{a.name} se está recuperando</h1>
+        <p className="lead">Todavía no se puede adoptar. Mira cómo ayudarle o conoce a otros animales que ya esperan una familia.</p>
+        <div className="actions">
+          <Link className="btn" href={`/animales/${a.id}`}>Ver a {a.name}</Link>
+          <Link className="btn ghost" href="/animales">Ver animales</Link>
+        </div>
+      </div>
+    );
+
   return (
     <div className="wrap page">
       <p><Link href={`/animales/${a.id}`}>← Volver a la ficha de {a.name}</Link></p>
