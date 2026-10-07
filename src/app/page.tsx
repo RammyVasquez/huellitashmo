@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import AnimalCard from "@/components/AnimalCard";
 import FotoFit from "@/components/FotoFit";
+import HeroRotator from "@/components/HeroRotator";
 import { EMERGENCIAS } from "@/lib/primeros-auxilios";
 import type { Animal, ImpactStats } from "@/lib/types";
 
@@ -50,14 +51,7 @@ export default async function Home() {
           </div>
           <p className="confianza">Gratis · aquí no se maneja dinero</p>
         </div>
-        {featured ? (
-          <Link href={`/animales/${featured.id}`} className="hero-photo solo-escritorio" aria-label={`Conoce a ${featured.name}`}>
-            <FotoFit eager src={featured.photo_url!} alt={`Foto de ${featured.name}`} />
-            <span className="hero-tag">Conoce a {featured.name}</span>
-          </Link>
-        ) : (
-          <div className="hero-photo solo-escritorio"><div className="ph" /></div>
-        )}
+        <HeroRotator animals={animals.filter((a) => a.photo_url).slice(0, 6).map((a) => ({ id: a.id, name: a.name, photo_url: a.photo_url! }))} />
       </div>
 
       {/* Celular: carrusel para deslizar, justo después de la presentación */}
