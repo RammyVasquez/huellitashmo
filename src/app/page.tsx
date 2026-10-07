@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import AnimalCard from "@/components/AnimalCard";
 import FotoFit from "@/components/FotoFit";
+import { esteril } from "@/lib/animales";
 import HeroRotator from "@/components/HeroRotator";
 import { EMERGENCIAS } from "@/lib/primeros-auxilios";
 import { TIPOS_EVENTO, type Animal, type EventRow, type ImpactStats, type Story } from "@/lib/types";
@@ -28,7 +29,7 @@ export default async function Home() {
   const items: [number, string][] = [
     [s.animales_registrados, "animales registrados"],
     [s.adopciones, "adopciones"],
-    [s.esterilizados, "esterilizados"],
+    [s.esterilizados, "esterilizados o castrados"],
     [s.padrinos, "padrinos"],
     [s.reunificaciones, "familias reunidas"],
     [s.auxiliados ?? 0, "animales auxiliados"],
@@ -77,7 +78,7 @@ export default async function Home() {
                     <div>
                       <span className="tag">{a.species}</span>
                       {a.age_text && <span className="tag">{a.age_text}</span>}
-                      {a.sterilized && <span className="tag ok">esterilizado</span>}
+                      {a.sterilized && <span className="tag ok">{esteril(a.sex)}</span>}
                     </div>
                   </div>
                 </Link>

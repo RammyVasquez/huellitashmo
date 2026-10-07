@@ -128,7 +128,7 @@ export default function AdoptionForm({ animalId, animalName, shelterName }: { an
         <SiNoOpciones valor={kids} set={setKids} name="kids" />
         <b>¿Tienes otros animales?</b>
         <SiNoOpciones valor={pets} set={setPets} name="pets" />
-        {pets === "si" && <label>¿Cuáles? (especie, edad, si están esterilizados)<input name="pets_note" /></label>}
+        {pets === "si" && <label>¿Cuáles? (especie, edad, si están esterilizados o castrados)<input name="pets_note" /></label>}
       </section>
 
       <section className="fs">
@@ -156,7 +156,7 @@ export default function AdoptionForm({ animalId, animalName, shelterName }: { an
             <strong>Cuidado responsable de por vida</strong>
             <span>Me comprometo a:</span>
             <span className="linea">Darle cuidados veterinarios y vacunas.</span>
-            <span className="linea">Esterilizarlo si aún no lo está.</span>
+            <span className="linea">Esterilizarlo o castrarlo si aún no lo está.</span>
             <span className="linea">No venderlo, regalarlo ni abandonarlo.</span>
             <span className="linea">Regresarlo al refugio si ya no puedo cuidarlo.</span>
           </span>

@@ -168,7 +168,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
             <option value="adoptado">Adoptado</option>
           </select>
         </label>
-        <label className="check"><input type="checkbox" name="sterilized" defaultChecked={editing?.sterilized} /> Esterilizado</label>
+        <label className="check"><input type="checkbox" name="sterilized" defaultChecked={editing?.sterilized} /> Esterilizado o castrado</label>
         <label className="check"><input type="checkbox" name="vaccinated" defaultChecked={editing?.vaccinated} /> Vacunado</label>
         <label className="check"><input type="checkbox" name="sponsorable" defaultChecked={editing?.sponsorable} /> Se puede apadrinar</label>
         <label>Número de padrinos<input name="sponsors" type="number" min={0} defaultValue={editing?.sponsors ?? 0} /></label>

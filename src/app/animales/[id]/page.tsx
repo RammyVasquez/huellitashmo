@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import AnimalGallery from "@/components/AnimalGallery";
+import { esteril } from "@/lib/animales";
 import ShelterBadges from "@/components/ShelterBadges";
 import ShareButtons from "@/components/ShareButtons";
 import { getAnimal, getShelter } from "@/lib/data";
@@ -46,7 +47,7 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
             <span className="tag">{a.species}</span>
             {a.sex && <span className="tag">{a.sex}</span>}
             {a.age_text && <span className="tag">{a.age_text}</span>}
-            {a.sterilized && <span className="tag ok">esterilizado</span>}
+            {a.sterilized && <span className="tag ok">{esteril(a.sex)}</span>}
             {a.vaccinated && <span className="tag ok">vacunado</span>}
             {a.status === "en_proceso" && <span className="tag urgente">adopción en proceso</span>}
             {a.status === "adoptado" && <span className="tag ok">¡ya encontró hogar!</span>}

@@ -226,7 +226,7 @@ export type EventRow = {
 
 export const TIPOS_EVENTO: Record<EventKind, string> = {
   adopcion: "Jornada de adopción",
-  esterilizacion: "Jornada de esterilización",
+  esterilizacion: "Jornada de esterilización y castración",
   acopio: "Acopio de donativos",
   otro: "Evento",
 };

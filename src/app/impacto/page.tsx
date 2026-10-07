@@ -29,7 +29,7 @@ export default async function Impacto() {
   const cifras: [number, string][] = [
     [s.animales_registrados ?? 0, "animales registrados"],
     [s.adopciones ?? 0, "adopciones"],
-    [s.esterilizados ?? 0, "animales esterilizados"],
+    [s.esterilizados ?? 0, "animales esterilizados o castrados"],
     [s.padrinos ?? 0, "padrinos"],
     [s.reunificaciones ?? 0, "familias reunidas"],
     [s.auxiliados ?? 0, "animales auxiliados"],
@@ -89,7 +89,7 @@ export default async function Impacto() {
                       {[
                         e.attendees != null ? `${e.attendees} asistentes` : "",
                         e.adoptions_count != null ? `${e.adoptions_count} adopciones` : "",
-                        e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones` : "",
+                        e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones y castraciones` : "",
                       ].filter(Boolean).join(" · ")}
                     </p>
                     {e.results_note && <p className="muted">{e.results_note}</p>}
@@ -110,8 +110,8 @@ export default async function Impacto() {
           <dd>Animales dados de alta en la plataforma por un refugio, estén o no disponibles.</dd>
           <dt>Adopciones</dt>
           <dd>Animales que el refugio marcó como adoptados en su panel. Es el refugio quien lo confirma.</dd>
-          <dt>Animales esterilizados</dt>
-          <dd>Animales registrados con el dato de “esterilizado”. Indica su estado, no necesariamente que la esterilización se haya hecho gracias a la plataforma.</dd>
+          <dt>Animales esterilizados o castrados</dt>
+          <dd>Animales registrados con el dato de “esterilizado o castrado”. Indica su estado, no necesariamente que la esterilización o castración se haya hecho gracias a la plataforma.</dd>
           <dt>Padrinos</dt>
           <dd>Número de padrinos que reporta cada refugio por animal. Es un dato que ellos actualizan, no un conteo automático.</dd>
           <dt>Familias reunidas</dt>
@@ -121,7 +121,7 @@ export default async function Impacto() {
           <dt>Animales auxiliados</dt>
           <dd>Casos de animales heridos, enfermos o en riesgo que el equipo marcó como resueltos.</dd>
           <dt>Eventos realizados</dt>
-          <dd>Jornadas de adopción, esterilización o acopio que un refugio o el equipo marcó como realizadas. Las cifras de cada evento (asistentes, adopciones, esterilizaciones) las captura quien lo organizó.</dd>
+          <dd>Jornadas de adopción, esterilización y castración, o acopio que un refugio o el equipo marcó como realizadas. Las cifras de cada evento (asistentes, adopciones, esterilizaciones y castraciones) las captura quien lo organizó.</dd>
           <dt>Historias publicadas</dt>
           <dd>Historias de adopción publicadas en el sitio con la autorización de la familia.</dd>
         </dl>

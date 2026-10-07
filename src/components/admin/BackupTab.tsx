@@ -85,7 +85,7 @@ export default function BackupTab() {
         bajar(`casos-${hoy}.csv`, csv(["origen", "tipo", "especie", "zona", "estado", "urgente", "fecha_reporte", "fecha_resolucion"], filas), "text/csv");
       } else if (cual === "animales") {
         const an = await todo("animals");
-        bajar(`animales-${hoy}.csv`, csv(["especie", "estado", "esterilizado", "vacunado", "refugio", "fecha_alta", "fecha_adopcion"],
+        bajar(`animales-${hoy}.csv`, csv(["especie", "estado", "esterilizado_castrado", "vacunado", "refugio", "fecha_alta", "fecha_adopcion"],
           an.map((a) => [String(a.species), String(a.status), a.sterilized ? "sí" : "no", a.vaccinated ? "sí" : "no", refugio(a.shelter_id), dia(a.created_at), dia(a.adopted_at)])), "text/csv");
       } else {
         const [req, an] = await Promise.all([todo("adoption_requests"), todo("animals")]);

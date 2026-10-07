@@ -13,7 +13,7 @@ function textoDe(a: Animal) {
     a.name, a.species, a.sex, a.age_text, a.description,
     a.age_group && EDAD[a.age_group], a.size && TAMANO[a.size], a.energy && ENERGIA[a.energy],
     a.good_kids === "si" && "niños", a.good_pets === "si" && "otros animales",
-    a.sterilized && "esterilizado", a.vaccinated && "vacunado",
+    a.sterilized && "esterilizado esterilizada castrado castrada castración", a.vaccinated && "vacunado",
   ].filter(Boolean).join(" ");
 }
 

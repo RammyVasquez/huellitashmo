@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Animal } from "@/lib/types";
 import FotoFit from "./FotoFit";
+import { esteril } from "@/lib/animales";
 
 export default function AnimalCard({ a }: { a: Animal }) {
   return (
@@ -11,7 +12,7 @@ export default function AnimalCard({ a }: { a: Animal }) {
         <div>
           <span className="tag">{a.species}</span>
           {a.age_text && <span className="tag">{a.age_text}</span>}
-          {a.sterilized && <span className="tag ok">esterilizado</span>}
+          {a.sterilized && <span className="tag ok">{esteril(a.sex)}</span>}
         </div>
       </div>
     </Link>

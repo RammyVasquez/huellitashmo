@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { TIPOS_EVENTO, type EventRow, type Shelter } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
-export const metadata = { title: "Eventos y jornadas · Huellitas HMO", description: "Jornadas de adopción, esterilización y acopio en Hermosillo." };
+export const metadata = { title: "Eventos y jornadas · Huellitas HMO", description: "Jornadas de adopción, esterilización y castración, y acopio en Hermosillo." };
 
 const cuando = (iso: string) =>
   new Date(iso).toLocaleString("es-MX", { timeZone: "America/Hermosillo", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
@@ -27,7 +27,7 @@ export default async function Eventos() {
   return (
     <div className="wrap page">
       <h1 style={{ fontSize: "clamp(2rem,5vw,3rem)" }}>Eventos y jornadas</h1>
-      <p className="lead">Jornadas de adopción, esterilización y acopio de donativos en especie. Ven, conoce a los animales y ayuda.</p>
+      <p className="lead">Jornadas de adopción, esterilización y castración, y acopio de donativos en especie. Ven, conoce a los animales y ayuda.</p>
 
       <section className="section">
         <h2>Próximos</h2>
@@ -71,7 +71,7 @@ export default async function Eventos() {
                     {[
                       e.attendees != null ? `${e.attendees} asistentes` : "",
                       e.adoptions_count != null ? `${e.adoptions_count} adopciones` : "",
-                      e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones` : "",
+                      e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones y castraciones` : "",
                     ].filter(Boolean).join(" · ")}
                   </p>
                   {e.results_note && <p className="muted clamp">{e.results_note}</p>}

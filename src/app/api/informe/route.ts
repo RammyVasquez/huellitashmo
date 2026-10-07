@@ -25,7 +25,7 @@ export async function GET() {
     cifras: [
       { etiqueta: "animales registrados", valor: s.animales_registrados ?? 0 },
       { etiqueta: "adopciones", valor: s.adopciones ?? 0 },
-      { etiqueta: "animales esterilizados", valor: s.esterilizados ?? 0 },
+      { etiqueta: "animales esterilizados o castrados", valor: s.esterilizados ?? 0 },
       { etiqueta: "padrinos", valor: s.padrinos ?? 0 },
       { etiqueta: "familias reunidas", valor: s.reunificaciones ?? 0 },
       { etiqueta: "animales auxiliados", valor: s.auxiliados ?? 0 },
@@ -42,7 +42,7 @@ export async function GET() {
       resultados: [
         e.attendees != null ? `${e.attendees} asistentes` : "",
         e.adoptions_count != null ? `${e.adoptions_count} adopciones` : "",
-        e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones` : "",
+        e.sterilizations_count != null ? `${e.sterilizations_count} esterilizaciones y castraciones` : "",
         e.results_note ?? "",
       ].filter(Boolean).join(" · "),
     })),

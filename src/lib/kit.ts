@@ -1,4 +1,5 @@
 import type { Animal } from "@/lib/types";
+import { esteril } from "@/lib/animales";
 
 const TAMANO = { pequeno: "pequeño", mediano: "mediano", grande: "grande" } as const;
 const ENERGIA = { tranquilo: "tranquilo", moderado: "energía moderada", activo: "muy activo" } as const;
@@ -17,7 +18,7 @@ export function etiquetasKit(a: Animal): string[] {
   const out = [a.species === "perro" ? "Perro" : a.species === "gato" ? "Gato" : "Animal"];
   if (a.age_text) out.push(a.age_text);
   if (a.size) out.push(TAMANO[a.size]);
-  if (a.sterilized) out.push(`Esterilizad${fin(a)}`);
+  if (a.sterilized) out.push(esteril(a.sex, true));
   return out.slice(0, 4);
 }
 
@@ -39,7 +40,7 @@ export function textoKit(a: Animal, refugio: string | null, url: string): string
     a.energy && ENERGIA[a.energy],
     a.good_kids === "si" && "se lleva bien con niños",
     a.good_pets === "si" && "se lleva bien con otros animales",
-    a.sterilized && `esterilizad${fin(a)}`,
+    a.sterilized && esteril(a.sex),
     a.vaccinated && `vacunad${fin(a)}`,
   ].filter(Boolean);
   return [

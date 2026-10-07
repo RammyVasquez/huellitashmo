@@ -38,7 +38,7 @@ const SINONIMOS: Record<Campo, string[]> = {
   energia: ["energia", "nivel de energia"],
   ninos: ["ninos", "se lleva bien con ninos", "con ninos"],
   otros: ["otros_animales", "otros animales", "otras mascotas", "con otros animales"],
-  esterilizado: ["esterilizado", "esterilizada", "castrado", "castrada"],
+  esterilizado: ["esterilizado", "esterilizada", "castrado", "castrada", "esterilizado_castrado", "esterilizado o castrado", "esterilizacion", "castracion"],
   vacunado: ["vacunado", "vacunada", "vacunas"],
   apadrinable: ["apadrinable", "apadrinar"],
   historia: ["historia", "descripcion", "caracter", "notas"],
@@ -49,7 +49,7 @@ const MAPA = new Map<string, Campo>();
 export const PLANTILLA_CSV =
   "\uFEFF" +
   [
-    "nombre,especie,sexo,edad,grupo_edad,tamano,energia,ninos,otros_animales,esterilizado,vacunado,apadrinable,historia",
+    "nombre,especie,sexo,edad,grupo_edad,tamano,energia,ninos,otros_animales,esterilizado_castrado,vacunado,apadrinable,historia",
     'EJEMPLO Canela,perro,hembra,2 años,joven,mediano,tranquilo,si,si,si,si,no,"Tranquila y cariñosa. Borra esta fila de ejemplo."',
     'EJEMPLO Michi,gato,macho,6 meses,cachorro,pequeño,activo,si,no,no,si,no,"Juguetón, rescatado de la calle. Borra esta fila de ejemplo."',
   ].join("\n");

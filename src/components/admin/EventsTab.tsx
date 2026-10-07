@@ -91,7 +91,7 @@ export default function EventsTab({ shelterId }: { shelterId?: string }) {
           <label>Asistentes (aprox.)<input name="attendees" type="number" min={0} /></label>
           <label>Adopciones logradas<input name="adoptions_count" type="number" min={0} /></label>
         </div>
-        <label>Esterilizaciones realizadas<input name="sterilizations_count" type="number" min={0} /></label>
+        <label>Esterilizaciones y castraciones realizadas<input name="sterilizations_count" type="number" min={0} /></label>
         <label>Resumen (ej. “12 kg de croquetas y 8 cobijas recibidas”)<textarea name="results_note" rows={3} maxLength={400} /></label>
         <div><b>Fotos del evento <span className="muted" style={{ fontWeight: 400 }}>(opcional)</span></b><PhotoPicker max={Math.max(0, 6 - (cerrando.photos?.length ?? 0))} onChange={setNuevas} /></div>
         {msg && !msg.ok && <p className="error" role="alert">{msg.text}</p>}
@@ -143,7 +143,7 @@ export default function EventsTab({ shelterId }: { shelterId?: string }) {
             <b>{ev.title}</b> <span className={`tag ${ev.status === "realizado" ? "ok" : ev.status === "cancelado" ? "alerta" : ""}`}>{ev.status}</span>
             <div className="muted">{TIPOS_EVENTO[ev.kind]} · {cuando(ev.starts_at)}{ev.place ? ` · ${ev.place}` : ""}</div>
             {ev.status === "realizado" && (
-              <div className="muted">{[ev.attendees != null ? `${ev.attendees} asistentes` : "", ev.adoptions_count != null ? `${ev.adoptions_count} adopciones` : "", ev.sterilizations_count != null ? `${ev.sterilizations_count} esterilizaciones` : ""].filter(Boolean).join(" · ")}</div>
+              <div className="muted">{[ev.attendees != null ? `${ev.attendees} asistentes` : "", ev.adoptions_count != null ? `${ev.adoptions_count} adopciones` : "", ev.sterilizations_count != null ? `${ev.sterilizations_count} esterilizaciones y castraciones` : ""].filter(Boolean).join(" · ")}</div>
             )}
           </div>
           <div className="row-actions">
