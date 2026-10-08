@@ -4,6 +4,8 @@ import AnimalCard from "@/components/AnimalCard";
 import FotoFit from "@/components/FotoFit";
 import { esteril } from "@/lib/animales";
 import HeroRotator from "@/components/HeroRotator";
+import EventoFecha from "@/components/EventoFecha";
+import { partesFecha } from "@/lib/eventos";
 import { EMERGENCIAS } from "@/lib/primeros-auxilios";
 import { TIPOS_EVENTO, type Animal, type EventRow, type ImpactStats, type Story } from "@/lib/types";
 
@@ -119,14 +121,17 @@ export default async function Home() {
         {proximos.length > 0 && (
           <section className="section" aria-labelledby="ev-titulo">
             <div className="section-head"><h2 id="ev-titulo">Próximos eventos</h2><Link href="/eventos">Ver todos</Link></div>
-            <div className="grid reportes">
+            <div className="ev-mini-grid">
               {proximos.map((e) => (
-                <Link key={e.id} href="/eventos" className="card">
-                  <div className="body">
-                    <span className="tag">{TIPOS_EVENTO[e.kind]}</span>
+                <Link key={e.id} href="/eventos" className="evento evento-mini">
+                  <EventoFecha iso={e.starts_at} />
+                  <div className="evento-body">
+                    <span className={`tag tipo-${e.kind}`}>{TIPOS_EVENTO[e.kind]}</span>
                     <h3>{e.title}</h3>
-                    <p style={{ margin: 0 }}><b>{new Date(e.starts_at).toLocaleString("es-MX", { timeZone: "America/Hermosillo", weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}</b></p>
-                    {e.place && <p className="muted" style={{ margin: ".2rem 0 0" }}>{e.place}</p>}
+                    <p className="ev-meta" style={{ margin: 0 }}>
+                      <span>{partesFecha(e.starts_at).hora}</span>
+                      {e.place && <span>{e.place}</span>}
+                    </p>
                   </div>
                 </Link>
               ))}
