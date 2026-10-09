@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { coincide } from "@/lib/buscar";
 import { errTexto, fechaCorta } from "@/lib/util";
 import MatchPanel from "./MatchPanel";
+import ReportEditor from "./ReportEditor";
 import type { AdminReport, ReportTip } from "@/lib/types";
 
 const ESTADOS = ["pendiente", "activo", "reunificado", "cerrado"] as const;
@@ -14,6 +15,7 @@ export default function ReportsTab() {
   const [filtro, setFiltro] = useState<Estado>("pendiente");
   const [msg, setMsg] = useState("");
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [editando, setEditando] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState("");
   const [tips, setTips] = useState<ReportTip[]>([]);
   const [aviso, setAviso] = useState<{ texto: string; enlaces: { id: string; etiqueta: string }[] } | null>(null);
@@ -124,6 +126,7 @@ export default function ReportsTab() {
             )}
           </div>
           <div className="row-actions">
+            <button className="btn ghost" aria-expanded={editando === r.id} onClick={() => { setEditando(editando === r.id ? null : r.id); setAbierto(null); }}>{editando === r.id ? "Cerrar edición" : "Editar"}</button>
             {acciones[r.status].map(([label, dest, primary]) => (
               <button key={label} className={`btn ${primary ? "alt" : "ghost"}`} onClick={() => cambiar(r.id, dest)}>{label}</button>
             ))}
@@ -134,6 +137,7 @@ export default function ReportsTab() {
             )}
           </div>
         </div>
+        {editando === r.id && <ReportEditor report={r} onSaved={() => { setEditando(null); load(); setMsg(""); }} onCancel={() => setEditando(null)} />}
         {abierto === r.id && <MatchPanel report={r} todos={items} onDone={() => { setAbierto(null); load(); }} />}
         </div>
       ))}

@@ -118,3 +118,6 @@ Requiere `supabase/migracion-023-zona-publica.sql`. En los reportes de mascotas 
 
 ## Kit de animales con el estilo cálido
 La imagen del kit de cada animal usa el mismo diseño que la de los reportes (fondo amarillo, nombre grande, foto inclinada y barra azul con QR). Las piezas comunes están en `src/lib/kit-comun.tsx`.
+
+## Editar reportes desde el panel
+Panel → Reportes → “Editar”: permite cambiar tipo, especie, descripción, zona y mapa, detalle reservado, WhatsApp y las fotos (agregar, quitar, elegir la principal; hasta 8). Si cambian las fotos, se borran sus huellas visuales para recalcularlas. Requiere `supabase/migracion-024-moderador-fotos.sql` para que los moderadores también suban fotos.
