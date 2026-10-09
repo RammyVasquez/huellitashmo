@@ -88,35 +88,61 @@ const cortarPalabra = (t: string, n: number) => {
   return l.length <= n ? l : `${l.slice(0, n).replace(/\s+\S*$/, "")}…`;
 };
 
+const CALLE = /^(c\.|calle|av\.?|avenida|blvd\.?|boulevard|calz\.?|calzada|prol\.?|prolongaci[oó]n|carretera|camino)(\s|$)/i;
+const RUIDO = /^(son\.?|sonora|m[eé]xico|mx|hermosillo)$/i;
+
+// Zona que sí se puede mostrar: en las encontradas, solo colonia o zona (sin calle ni números); en las perdidas, sin números de casa.
+export function zonaPublica(zona: string | null, kind: "perdido" | "encontrado"): string {
+  const z = (zona ?? "").trim();
+  if (!z) return "Hermosillo";
+  const segs = z.split(",").map((x) => x.trim()).filter(Boolean);
+  const limpios = kind === "encontrado"
+    ? segs.filter((x) => !/\d/.test(x) && !CALLE.test(x) && !RUIDO.test(x))
+    : segs.map((x) => x.replace(/\s*#?\b\d{1,5}[a-zA-Z]?\b/g, "").trim()).filter((x) => x && !RUIDO.test(x));
+  const r = limpios.join(", ") || z.replace(/\d+/g, "").replace(/\s+/g, " ").trim();
+  return r || "Hermosillo";
+}
+
 export function tituloReporte(r: ReporteKit) {
   const e = palabraEspecie(r.species);
   const fem = e === "mascota";
   return `${e.charAt(0).toUpperCase()}${e.slice(1)} ${r.kind === "perdido" ? (fem ? "perdida" : "perdido") : fem ? "encontrada" : "encontrado"}`;
 }
-export const etiquetasReporte = (r: ReporteKit, fecha: string) => [cortarPalabra(r.zone ?? "Hermosillo", 30), fecha].filter(Boolean);
-export const ctaReporte = (r: ReporteKit) => (r.kind === "perdido" ? "Ayúdanos a que vuelva a casa" : "¿Es tu mascota? Confírmalo aquí");
+
+// La descripción guarda las señas al final ("Señas particulares: ..."): se separan para que se lean mejor
+export function partesDescripcion(d: string): { descripcion: string; senas: string } {
+  const m = d.split(/\n\s*\n?\s*Señas particulares:\s*/i);
+  return { descripcion: m[0].replace(/\s+/g, " ").trim(), senas: (m[1] ?? "").replace(/\s+/g, " ").trim() };
+}
 
 export function textoKitReporte(r: ReporteKit, url: string, fecha: string): string {
-  const e = palabraEspecie(r.species).toUpperCase();
-  const zona = r.zone ?? "Hermosillo";
+  const e = palabraEspecie(r.species);
+  const E = e.toUpperCase();
+  const zona = zonaPublica(r.zone, r.kind);
+  const { descripcion, senas } = partesDescripcion(r.description);
+  const cuerpo = [cortarPalabra(descripcion, 240), senas ? `🔎 Señas: ${cortarPalabra(senas, 160)}` : ""].filter(Boolean);
   if (r.kind === "perdido")
     return [
-      `🚨 SE PERDIÓ ${e === "MASCOTA" ? "UNA MASCOTA" : `UN ${e}`} en ${zona}`,
-      `Desde el ${fecha}.`,
+      `🚨 ¡SE PERDIÓ ${E === "MASCOTA" ? "UNA MASCOTA" : `UN ${E}`}! ¿Lo has visto?`,
+      `📍 ${zona}`,
+      `📅 Desde el ${fecha}`,
       "",
-      cortarPalabra(r.description, 280),
+      ...cuerpo,
       "",
-      `Si lo has visto o tienes información, entra aquí (sin dar vueltas): ${url}`,
+      `Si tienes información, entra aquí 👉 ${url}`,
+      "",
       "¡Compártelo, por favor! 🙏",
       "#MascotaPerdida #Hermosillo #HuellitasHMO",
     ].join("\n");
   return [
-    `🐾 SE ENCONTRÓ ${e === "MASCOTA" ? "UNA MASCOTA" : `UN ${e}`} · zona aproximada: ${zona}`,
-    `Reportado el ${fecha}.`,
+    `🐾 ¡SE ENCONTRÓ ${E === "MASCOTA" ? "UNA MASCOTA" : `UN ${E}`}! ¿Es tu ${e}?`,
+    `📍 Zona aproximada: ${zona}`,
+    `📅 Reportado el ${fecha}`,
     "",
-    cortarPalabra(r.description, 280),
+    ...cuerpo,
     "",
-    `¿Es tu mascota o conoces a su familia? Confírmalo aquí: ${url}`,
+    `Si es tuyo o conoces a su familia, confírmalo aquí 👉 ${url}`,
+    "",
     "¡Compártelo para que regrese a casa! 🙏",
     "#MascotaEncontrada #Hermosillo #HuellitasHMO",
   ].join("\n");

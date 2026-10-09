@@ -112,3 +112,6 @@ Requiere `supabase/migracion-022-reportes-sin-whatsapp.sql`.
 - El WhatsApp de quien reporta una mascota es opcional; con foto basta (la descripción es opcional si hay foto).
 - Si un reporte no tiene contacto, su ficha muestra “Tengo información”: el mensaje llega a `report_tips` (se ve en Panel → Reportes) y por Telegram.
 - Pie de página nuevo en `src/components/SiteFooter.tsx`.
+
+## Zona pública y kit de reportes
+Requiere `supabase/migracion-023-zona-publica.sql`. En los reportes de mascotas encontradas, la zona que se muestra en público es solo la colonia (sin calle, número ni código postal); en las perdidas se quitan números de casa. La imagen y el texto del kit (`/reportes/[id]/kit`) usan el diseño nuevo (`src/lib/kit-reporte-tarjeta.tsx`).
