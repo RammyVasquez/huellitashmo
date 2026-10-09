@@ -3,11 +3,11 @@ import { useState } from "react";
 
 type NavConCompartir = Navigator & { canShare?: (d: ShareData) => boolean };
 
-export default function KitCompartir({ id, nombre, textoInicial, archivo }: { id: string; nombre: string; textoInicial: string; archivo: string }) {
+export default function KitCompartir({ id, nombre, textoInicial, archivo, imagen: imagenProp }: { id: string; nombre: string; textoInicial: string; archivo: string; imagen?: string }) {
   const [texto, setTexto] = useState(textoInicial);
   const [copiado, setCopiado] = useState(false);
   const [aviso, setAviso] = useState("");
-  const imagen = `/api/kit/${id}/imagen`;
+  const imagen = imagenProp ?? `/api/kit/${id}/imagen`;
 
   async function copiar() {
     try { await navigator.clipboard.writeText(texto); setCopiado(true); setTimeout(() => setCopiado(false), 2000); }

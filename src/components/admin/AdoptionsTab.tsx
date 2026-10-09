@@ -23,7 +23,7 @@ export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
 
   const load = useCallback(async () => {
     const a = await supabase.from("adoption_requests")
-      .select("*, animals(name, photo_url, species, shelter_id, status, good_kids, good_pets, size, energy)")
+      .select("*, animals(name, photo_url, species, shelter_id, status, good_kids, good_pets, size, energy, contact_whatsapp)")
       .order("created_at", { ascending: false }).limit(300);
     if (a.error) setMsg(`No se pudieron cargar las solicitudes: ${errTexto(a.error)}`);
     setItems((a.data ?? []) as unknown as AdoptionRequest[]);
@@ -153,8 +153,8 @@ export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
                 {rol !== "refugio" && (
                   <>
                     {" · "}
-                    {sh?.whatsapp
-                      ? <a href={`https://wa.me/${sh.whatsapp}?text=${encodeURIComponent(resumenParaRefugio(r))}`} target="_blank" rel="noopener noreferrer">Enviar resumen al refugio</a>
+                    {(r.animals?.contact_whatsapp || sh?.whatsapp)
+                      ? <a href={`https://wa.me/${r.animals?.contact_whatsapp || sh?.whatsapp}?text=${encodeURIComponent(resumenParaRefugio(r))}`} target="_blank" rel="noopener noreferrer">Enviar resumen al refugio</a>
                       : <span className="muted">El refugio no tiene WhatsApp registrado</span>}
                   </>
                 )}

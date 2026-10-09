@@ -58,6 +58,7 @@ export default async function FichaReporte({ params }: { params: { id: string } 
             <div className="actions">
               <a className="btn" href={`/api/contacto/${r.id}`}>{r.kind === "perdido" ? "Vi a esta mascota" : "Es mi mascota"}</a>
               <Link className="btn ghost" href={`/reportes/${r.id}/cartel`}>Imprimir cartel</Link>
+              <Link className="btn ghost" href={`/reportes/${r.id}/kit`}>Imagen y texto para compartir</Link>
             </div>
           )}
           {r.kind === "encontrado" && activo && (

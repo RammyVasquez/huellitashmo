@@ -96,3 +96,13 @@ Requiere `supabase/migracion-018-visitas-cuidados-recuperacion.sql`.
 
 ## Registro de padrinos
 Requiere `supabase/migracion-019-padrinos.sql`. Cada apadrinamiento se anota en Panel → Padrinos (nombre o apodo, qué cubre, desde cuándo, contacto opcional). El número de padrinos de cada animal (vigentes) se calcula con un disparador en la base y la cifra “padrinos” de Impacto cuenta todos los registros. Los nombres y contactos son privados.
+
+## Contacto por animal
+Requiere `supabase/migracion-020-contacto-por-animal.sql`. Cada animal puede tener su propio contacto (nombre y WhatsApp) para quien rescata con más de una persona; si no lo tiene, se usa el WhatsApp del refugio. Se captura en el formulario del animal o con las columnas `contacto_nombre` y `contacto_whatsapp` de la plantilla de importación.
+
+## Encontrar mascotas perdidas
+Requiere `supabase/migracion-021-detalle-reservado.sql`.
+- Al enviar un reporte, la persona ve de inmediato los reportes del tipo contrario (misma especie, cerca y recientes): `CoincidenciasRapidas`.
+- El formulario pide “señas particulares” y, en mascotas encontradas, un detalle reservado (nunca público) para confirmar al dueño.
+- Al publicar un reporte en el panel, `/api/coincidencias` busca posibles coincidencias (distancia, zona y rasgos en común; sin IA) y avisa por Telegram.
+- Kit para compartir de reportes: `/reportes/[id]/kit` (imagen cuadrada con QR y texto; no incluye teléfonos).

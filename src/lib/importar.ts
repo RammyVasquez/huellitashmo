@@ -1,7 +1,7 @@
 // Importación de animales desde una hoja de Excel o CSV. Todo corre en el navegador de quien importa.
 export type Campo =
   | "nombre" | "especie" | "sexo" | "edad" | "grupo_edad" | "tamano" | "energia"
-  | "ninos" | "otros" | "esterilizado" | "vacunado" | "apadrinable" | "historia";
+  | "ninos" | "otros" | "esterilizado" | "vacunado" | "apadrinable" | "historia" | "contacto_nombre" | "contacto_whatsapp";
 
 export type FilaImport = {
   fila: number;                       // número de fila en la hoja (la 1 son los encabezados)
@@ -18,6 +18,8 @@ export type FilaImport = {
   vaccinated: boolean;
   sponsorable: boolean;
   description: string | null;
+  contact_name: string | null;
+  contact_whatsapp: string | null;
   errores: string[];                  // impiden importar la fila
   avisos: string[];                   // se importa, pero conviene revisar
   duplicado: string | null;           // motivo si ya existe y se omitirá
@@ -42,6 +44,8 @@ const SINONIMOS: Record<Campo, string[]> = {
   vacunado: ["vacunado", "vacunada", "vacunas"],
   apadrinable: ["apadrinable", "apadrinar"],
   historia: ["historia", "descripcion", "caracter", "notas"],
+  contacto_nombre: ["contacto_nombre", "contacto", "nombre de contacto", "persona de contacto"],
+  contacto_whatsapp: ["contacto_whatsapp", "whatsapp", "whatsapp de contacto", "telefono de contacto"],
 };
 const MAPA = new Map<string, Campo>();
 (Object.keys(SINONIMOS) as Campo[]).forEach((c) => SINONIMOS[c].forEach((s) => MAPA.set(compacto(s), c)));
@@ -49,9 +53,9 @@ const MAPA = new Map<string, Campo>();
 export const PLANTILLA_CSV =
   "\uFEFF" +
   [
-    "nombre,especie,sexo,edad,grupo_edad,tamano,energia,ninos,otros_animales,esterilizado_castrado,vacunado,apadrinable,historia",
-    'EJEMPLO Canela,perro,hembra,2 años,joven,mediano,tranquilo,si,si,si,si,no,"Tranquila y cariñosa. Borra esta fila de ejemplo."',
-    'EJEMPLO Michi,gato,macho,6 meses,cachorro,pequeño,activo,si,no,no,si,no,"Juguetón, rescatado de la calle. Borra esta fila de ejemplo."',
+    "nombre,especie,sexo,edad,grupo_edad,tamano,energia,ninos,otros_animales,esterilizado_castrado,vacunado,apadrinable,historia,contacto_nombre,contacto_whatsapp",
+    'EJEMPLO Canela,perro,hembra,2 años,joven,mediano,tranquilo,si,si,si,si,no,"Tranquila y cariñosa. Borra esta fila de ejemplo.",,',
+    'EJEMPLO Michi,gato,macho,6 meses,cachorro,pequeño,activo,si,no,no,si,no,"Juguetón, rescatado de la calle. Borra esta fila de ejemplo.",,',
   ].join("\n");
 
 type Par<T> = [T, string | null];
@@ -121,12 +125,21 @@ export function interpretar(filas: string[][]): { filas: FilaImport[]; ignoradas
     let description: string | null = celda(r, "historia").trim() || null;
     if (description && description.length > 2000) { description = description.slice(0, 2000); avisos.push("La historia se recortó a 2000 caracteres"); }
 
+    const contact_name = celda(r, "contacto_nombre").trim().slice(0, 60) || null;
+    let contact_whatsapp: string | null = null;
+    const rawWa = celda(r, "contacto_whatsapp").replace(/\D/g, "");
+    if (rawWa) {
+      const wa = rawWa.length === 10 ? `52${rawWa}` : rawWa;
+      if (wa.length < 12 || wa.length > 15) errores.push("El WhatsApp de contacto debe tener 10 dígitos");
+      else contact_whatsapp = wa;
+    }
+
     out.push({
       fila: k + 2, nombre, species, sex, age_text, age_group, size, energy,
       good_kids: kids === null ? null : kids ? "si" : "no",
       good_pets: pets === null ? null : pets ? "si" : "no",
       sterilized: ster === true, vaccinated: vac === true, sponsorable: pad === true,
-      description, errores, avisos, duplicado: null,
+      description, contact_name, contact_whatsapp, errores, avisos, duplicado: null,
     });
   });
 
@@ -156,6 +169,7 @@ export function aPayload(f: FilaImport, shelterId: string) {
     shelter_id: shelterId, name: f.nombre, species: f.species, sex: f.sex, age_text: f.age_text, age_group: f.age_group,
     size: f.size, energy: f.energy, good_kids: f.good_kids, good_pets: f.good_pets,
     sterilized: f.sterilized, vaccinated: f.vaccinated, sponsorable: f.sponsorable, sponsors: 0,
-    description: f.description, status: "disponible", photo_url: null, photos: [] as string[],
+    description: f.description, contact_name: f.contact_name, contact_whatsapp: f.contact_whatsapp,
+    status: "disponible", photo_url: null, photos: [] as string[],
   };
 }

@@ -21,6 +21,8 @@ export type Animal = {
   age_group: "cachorro" | "joven" | "adulto" | "senior" | null;
   good_kids: "si" | "no" | null;
   good_pets: "si" | "no" | null;
+  contact_name: string | null;       // contacto propio de este animal (si no, se usa el del refugio)
+  contact_whatsapp: string | null;
 };
 
 export type Shelter = {
@@ -89,6 +91,7 @@ export type AdminReport = {
   status: "pendiente" | "activo" | "reunificado" | "cerrado";
   created_at: string;
   photos: string[] | null;
+  private_detail?: string | null;
 };
 
 export type WelfareCategory = "atropellado_herido" | "enfermo" | "maltrato" | "abandono_encierro" | "otro";
@@ -157,7 +160,7 @@ export type AdoptionRequest = {
   admin_notes: string | null;
   adopted_at: string | null;
   created_at: string;
-  animals: Pick<Animal, "name" | "photo_url" | "species" | "shelter_id" | "status" | "good_kids" | "good_pets" | "size" | "energy"> | null;
+  animals: Pick<Animal, "name" | "photo_url" | "species" | "shelter_id" | "status" | "good_kids" | "good_pets" | "size" | "energy" | "contact_whatsapp"> | null;
 };
 
 export type Followup = {

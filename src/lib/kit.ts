@@ -78,3 +78,46 @@ export function ctaKit(a: Animal): string {
   if (a.status === "en_cuidados") return "Ayúdale a recuperarse";
   return a.sex === "hembra" ? "Adóptala" : a.sex === "macho" ? "Adóptalo" : "Dale un hogar";
 }
+
+
+// ---- Kit para reportes de mascotas perdidas o encontradas (no incluye ningún teléfono) ----
+type ReporteKit = { kind: "perdido" | "encontrado"; species: string; description: string; zone: string | null; created_at: string };
+const palabraEspecie = (e: string) => (e === "perro" ? "perro" : e === "gato" ? "gato" : "mascota");
+const cortarPalabra = (t: string, n: number) => {
+  const l = t.replace(/\s+/g, " ").trim();
+  return l.length <= n ? l : `${l.slice(0, n).replace(/\s+\S*$/, "")}…`;
+};
+
+export function tituloReporte(r: ReporteKit) {
+  const e = palabraEspecie(r.species);
+  const fem = e === "mascota";
+  return `${e.charAt(0).toUpperCase()}${e.slice(1)} ${r.kind === "perdido" ? (fem ? "perdida" : "perdido") : fem ? "encontrada" : "encontrado"}`;
+}
+export const etiquetasReporte = (r: ReporteKit, fecha: string) => [cortarPalabra(r.zone ?? "Hermosillo", 30), fecha].filter(Boolean);
+export const ctaReporte = (r: ReporteKit) => (r.kind === "perdido" ? "Ayúdanos a que vuelva a casa" : "¿Es tu mascota? Confírmalo aquí");
+
+export function textoKitReporte(r: ReporteKit, url: string, fecha: string): string {
+  const e = palabraEspecie(r.species).toUpperCase();
+  const zona = r.zone ?? "Hermosillo";
+  if (r.kind === "perdido")
+    return [
+      `🚨 SE PERDIÓ ${e === "MASCOTA" ? "UNA MASCOTA" : `UN ${e}`} en ${zona}`,
+      `Desde el ${fecha}.`,
+      "",
+      cortarPalabra(r.description, 280),
+      "",
+      `Si lo has visto o tienes información, entra aquí (sin dar vueltas): ${url}`,
+      "¡Compártelo, por favor! 🙏",
+      "#MascotaPerdida #Hermosillo #HuellitasHMO",
+    ].join("\n");
+  return [
+    `🐾 SE ENCONTRÓ ${e === "MASCOTA" ? "UNA MASCOTA" : `UN ${e}`} · zona aproximada: ${zona}`,
+    `Reportado el ${fecha}.`,
+    "",
+    cortarPalabra(r.description, 280),
+    "",
+    `¿Es tu mascota o conoces a su familia? Confírmalo aquí: ${url}`,
+    "¡Compártelo para que regrese a casa! 🙏",
+    "#MascotaEncontrada #Hermosillo #HuellitasHMO",
+  ].join("\n");
+}

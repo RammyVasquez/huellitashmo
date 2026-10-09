@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { uploadPhoto } from "@/lib/upload";
-import { errTexto } from "@/lib/util";
+import { errTexto, normalizeWa } from "@/lib/util";
 import PhotoPicker from "../PhotoPicker";
 import ImportAnimals from "./ImportAnimals";
 import { useShelters } from "./useShelters";
@@ -40,7 +40,11 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
       const subidas = await Promise.all(nuevas.map((f) => uploadPhoto(f, "animales")));
       const lista = [...fotos, ...subidas];
       const status = String(fd.get("status"));
+      const contactoWa = normalizeWa(String(fd.get("contact_whatsapp") ?? ""));
+      if (contactoWa && (contactoWa.length < 12 || contactoWa.length > 15)) throw new Error("El WhatsApp de contacto debe tener 10 dígitos.");
       const payload = {
+        contact_name: String(fd.get("contact_name") ?? "").trim() || null,
+        contact_whatsapp: contactoWa,
         shelter_id: String(fd.get("shelter_id")) || null,
         name: String(fd.get("name")).trim(),
         species: fd.get("species"),
@@ -171,6 +175,14 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
         <label className="check"><input type="checkbox" name="sterilized" defaultChecked={editing?.sterilized} /> Esterilizado o castrado</label>
         <label className="check"><input type="checkbox" name="vaccinated" defaultChecked={editing?.vaccinated} /> Vacunado</label>
         <label className="check"><input type="checkbox" name="sponsorable" defaultChecked={editing?.sponsorable} /> Se puede apadrinar</label>
+        <details>
+          <summary>Contacto distinto al del refugio (opcional)</summary>
+          <p className="muted" style={{ marginTop: ".5rem" }}>Úsalo si otra persona se encarga de este animal. Si lo dejas vacío, la gente escribe al WhatsApp del refugio. Aparece como un botón; el número no se muestra escrito.</p>
+          <div className="two">
+            <label>Nombre de la persona<input name="contact_name" maxLength={60} defaultValue={editing?.contact_name ?? ""} placeholder="Ej. Lily T." /></label>
+            <label>WhatsApp (10 dígitos)<input name="contact_whatsapp" inputMode="numeric" defaultValue={editing?.contact_whatsapp ? editing.contact_whatsapp.replace(/^52/, "") : ""} /></label>
+          </div>
+        </details>
         <p className="muted" style={{ margin: 0, fontSize: ".92rem" }}>Los padrinos se anotan en la pestaña <b>Padrinos</b>: ahí queda quién apadrina y qué cubre, y el número se calcula solo.</p>
         <div className="actions" style={{ margin: 0 }}>
           <button className="btn" disabled={guardando}>{guardando ? "Guardando…" : editing ? "Guardar cambios" : "Registrar animal"}</button>

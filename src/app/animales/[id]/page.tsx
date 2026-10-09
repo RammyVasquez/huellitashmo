@@ -31,8 +31,9 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
   if (!a) notFound();
   const shelter = a.shelter_id ? await getShelter(a.shelter_id) : null;
 
-  const wa = (msg: string) =>
-    shelter?.whatsapp ? `https://wa.me/${shelter.whatsapp}?text=${encodeURIComponent(msg)}` : null;
+  const numero = a.contact_whatsapp || shelter?.whatsapp || null; // contacto propio del animal; si no, el del refugio
+  const aQuien = a.contact_whatsapp && a.contact_name ? a.contact_name : "al refugio";
+  const wa = (msg: string) => (numero ? `https://wa.me/${numero}?text=${encodeURIComponent(msg)}` : null);
   const adoptar = wa(`Hola, me interesa adoptar a ${a.name} (vi su perfil en Huellitas HMO).`);
   const apadrinar = wa(`Hola, quiero apadrinar a ${a.name} con un donativo en especie (vi su perfil en Huellitas HMO). ¿Qué necesita?`);
 
@@ -76,11 +77,11 @@ export default async function AnimalDetalle({ params }: { params: { id: string }
           {a.status !== "adoptado" && a.status !== "en_cuidados" && (
             <div className="actions">
               <Link className="btn" href={`/animales/${a.id}/adoptar`}>Quiero adoptar a {a.name}</Link>
-              {adoptar && <a className="btn ghost" href={adoptar}>Prefiero escribir al refugio</a>}
+              {adoptar && <a className="btn ghost" href={adoptar}>Prefiero escribir {aQuien}</a>}
               {a.sponsorable && apadrinar && <a className="btn alt" href={apadrinar}>Apadrinar en especie</a>}
             </div>
           )}
-          {!shelter?.whatsapp && a.status !== "adoptado" && a.status !== "en_cuidados" && <p className="muted">Este refugio aún no registró un contacto por WhatsApp.</p>}
+          {!numero && a.status !== "adoptado" && a.status !== "en_cuidados" && <p className="muted">Este refugio aún no registró un contacto por WhatsApp.</p>}
           {a.sponsors > 0 && <p className="muted">{a.name} ya tiene {a.sponsors} {a.sponsors === 1 ? "padrino" : "padrinos"}.</p>}
 
           {shelter && (

@@ -9,6 +9,7 @@ export type DatosKit = {
   estado: "disponible" | "en_cuidados" | "adoptado";
   cta: string;           // ej. "Adóptala"
   qr: string | null;     // data URI del código QR hacia la ficha
+  pastilla?: { texto: string; fondo: string; color: string }; // para reportes de mascotas perdidas o encontradas
 };
 
 const NAVY = "#13284f";
@@ -40,7 +41,8 @@ function Marca({ tam = 32 }: { tam?: number }) {
   );
 }
 
-function Pastilla({ estado, tam = 30 }: { estado: DatosKit["estado"]; tam?: number }) {
+function Pastilla({ estado, pastilla, tam = 30 }: { estado: DatosKit["estado"]; pastilla?: DatosKit["pastilla"]; tam?: number }) {
+  if (pastilla) return <div style={{ display: "flex", padding: "8px 24px", borderRadius: 40, background: pastilla.fondo, color: pastilla.color, fontSize: tam, ...DISPLAY }}>{pastilla.texto}</div>;
   const fondo = estado === "adoptado" ? "#2f9e6e" : estado === "en_cuidados" ? "#8fb8ff" : SOL;
   const texto = estado === "adoptado" ? "#ffffff" : NAVY;
   const t = estado === "adoptado" ? "YA TIENE HOGAR" : estado === "en_cuidados" ? "EN CUIDADOS" : "BUSCA HOGAR";
@@ -111,14 +113,14 @@ export function TarjetaKit({ d }: { d: DatosKit }) {
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", marginLeft: 44, width: col, height: 952 }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <Marca tam={28} />
-            <div style={{ display: "flex", marginTop: 34 }}><Pastilla estado={d.estado} tam={26} /></div>
+            <div style={{ display: "flex", marginTop: 34 }}><Pastilla estado={d.estado} pastilla={d.pastilla} tam={26} /></div>
             <div style={{ display: "flex", marginTop: 26, fontSize: tamNombre(d.nombre, col, 104), lineHeight: 1.02, ...DISPLAY }}>{d.nombre}</div>
             <div style={{ display: "flex", marginTop: 22 }}><Etiquetas lista={d.etiquetas} tam={26} /></div>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center" }}>
               <Qr src={d.qr} lado={150} />
-              <div style={{ display: "flex", marginLeft: 16, fontSize: 22, lineHeight: 1.15, color: "#dbe5f7", width: Math.max(120, col - 166) }}>Escanea para ver su ficha</div>
+              <div style={{ display: "flex", marginLeft: 16, fontSize: 22, lineHeight: 1.15, color: "#dbe5f7", width: Math.max(120, col - 166) }}>Escanea para ver más</div>
             </div>
             <div style={{ display: "flex", marginTop: 18, fontSize: 34, fontWeight: 700, color: SOL, lineHeight: 1.1 }}>{d.cta}</div>
             <div style={{ display: "flex", fontSize: 26, fontWeight: 700, color: "#ffffff", marginTop: 4 }}>huellitashmo.site</div>
@@ -135,7 +137,7 @@ export function TarjetaKit({ d }: { d: DatosKit }) {
       <Adorno />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Marca tam={32} />
-        <Pastilla estado={d.estado} />
+        <Pastilla estado={d.estado} pastilla={d.pastilla} />
       </div>
       <div style={{ display: "flex", position: "relative", marginTop: 26, width: 968, height: 580, borderRadius: 44, border: "8px solid #ffffff", overflow: "hidden", background: "#0d1d3d" }}>
         {d.foto ? (

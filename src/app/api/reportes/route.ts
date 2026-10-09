@@ -14,7 +14,10 @@ export async function POST(req: Request) {
 
     const kind = opcion(fd, "kind", ["perdido", "encontrado"] as const);
     const species = opcion(fd, "species", ESPECIES);
-    const description = texto(fd, "description", 5, 1500, "la descripción");
+    const descripcion = texto(fd, "description", 5, 1000, "la descripción");
+    const senas = String(fd.get("marks") ?? "").trim().slice(0, 400);
+    const description = senas ? `${descripcion}\n\nSeñas particulares: ${senas}` : descripcion;
+    const detalle = kind === "encontrado" ? String(fd.get("private_detail") ?? "").trim().slice(0, 300) : "";
     const zone = texto(fd, "zone", 2, 160, "la zona");
     const wa = normalizeWa(String(fd.get("whatsapp") ?? ""));
     if (!wa || wa.length < 12 || wa.length > 15) throw new ErrorUsuario("Escribe tu WhatsApp con 10 dígitos.");
@@ -23,7 +26,7 @@ export async function POST(req: Request) {
 
     const { error } = await supabaseAdmin().from("reports").insert({
       kind, species, description, zone, lat, lng,
-      contact_whatsapp: wa, photo_url: photos[0] ?? null, photos, status: "pendiente",
+      contact_whatsapp: wa, photo_url: photos[0] ?? null, photos, status: "pendiente", private_detail: detalle || null,
     });
     if (error) throw error;
 

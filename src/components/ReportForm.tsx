@@ -7,6 +7,7 @@ import type { Pos } from "@/lib/geo";
 import PhotoPicker from "./PhotoPicker";
 import Turnstile, { CAPTCHA_ACTIVO } from "./Turnstile";
 import ZonePicker from "./ZonePicker";
+import CoincidenciasRapidas from "./CoincidenciasRapidas";
 
 const MAX_FOTOS = 5;
 type Kind = "perdido" | "encontrado";
@@ -33,6 +34,7 @@ export default function ReportForm() {
   const [token, setToken] = useState("");
   const [captchaKey, setCaptchaKey] = useState(0);
   const [vuelta, setVuelta] = useState(0);
+  const [enviado, setEnviado] = useState<{ kind: Kind; species: Species; loc: Pos | null; descripcion: string } | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +57,8 @@ export default function ReportForm() {
       body.set("kind", kind);
       body.set("species", species);
       body.set("description", String(fd.get("description")).trim());
+      body.set("marks", String(fd.get("marks") ?? "").trim());
+      if (kind === "encontrado") body.set("private_detail", String(fd.get("private_detail") ?? "").trim());
       body.set("zone", zona.trim());
       body.set("whatsapp", wa);
       if (loc) { body.set("lat", String(loc.lat)); body.set("lng", String(loc.lng)); }
@@ -66,6 +70,7 @@ export default function ReportForm() {
       const res = await fetch("/api/reportes", { method: "POST", body });
       const out = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(out.error ?? "No pudimos enviar el reporte.");
+      setEnviado({ kind, species, loc, descripcion: `${String(fd.get("description"))} ${String(fd.get("marks") ?? "")}` });
       setEstado("ok");
     } catch (err) {
       console.error(err);
@@ -77,7 +82,7 @@ export default function ReportForm() {
   }
 
   function reiniciar() {
-    setKind("perdido"); setSpecies("perro"); setZona(""); setLoc(null); setFiles([]);
+    setKind("perdido"); setSpecies("perro"); setZona(""); setLoc(null); setFiles([]); setEnviado(null);
     setMensaje(""); setToken(""); setEstado("idle"); setVuelta((v) => v + 1);
   }
 
@@ -90,6 +95,7 @@ export default function ReportForm() {
           <Link className="btn" href="/reportes">Ver perdidos y encontrados</Link>
           <button className="btn ghost" onClick={reiniciar}>Hacer otro reporte</button>
         </div>
+        {enviado && <CoincidenciasRapidas kind={enviado.kind} species={enviado.species} loc={enviado.loc} descripcion={enviado.descripcion} />}
       </div>
     );
 
@@ -110,9 +116,17 @@ export default function ReportForm() {
           <Opcion name="species" activo={species === "gato"} onClick={() => setSpecies("gato")} titulo="Gato" />
           <Opcion name="species" activo={species === "otro"} onClick={() => setSpecies("otro")} titulo="Otro" />
         </div>
-        <label>Descripción (color, tamaño, collar, señas particulares)
-          <textarea name="description" rows={4} required />
+        <label>Descripción: color, tamaño, edad aproximada y cómo es
+          <textarea name="description" rows={3} maxLength={1000} required placeholder="Ej. Perro mediano, color café claro, como de 3 años, muy amigable" />
         </label>
+        <label>Señas particulares <span className="muted" style={{ fontWeight: 400 }}>(lo que más ayuda a reconocerlo)</span>
+          <input name="marks" maxLength={400} placeholder="Ej. mancha blanca en la panza, collar rosa con cascabel, cicatriz en la oreja" />
+        </label>
+        {kind === "encontrado" && (
+          <label>Un detalle que NO vamos a publicar <span className="muted" style={{ fontWeight: 400 }}>(opcional)</span>
+            <input name="private_detail" maxLength={300} placeholder="Algo que solo su dueño sabría, para confirmar que es suyo" />
+          </label>
+        )}
         <div>
           <b>Fotos <span className="muted" style={{ fontWeight: 400 }}>(hasta {MAX_FOTOS}; de frente, de lado y su seña particular)</span></b>
           <PhotoPicker key={vuelta} max={MAX_FOTOS} onChange={setFiles} />
