@@ -63,6 +63,7 @@ export type PublicReport = {
   created_at: string;
   photos: string[] | null;
   code?: string;
+  has_contact?: boolean;   // false = quien reportó no dejó WhatsApp
 };
 
 export type ImpactStats = {
@@ -87,7 +88,7 @@ export type AdminReport = {
   zone: string | null;
   lat: number | null;
   lng: number | null;
-  contact_whatsapp: string;
+  contact_whatsapp: string | null;
   status: "pendiente" | "activo" | "reunificado" | "cerrado";
   created_at: string;
   photos: string[] | null;
@@ -246,3 +247,5 @@ export type Sponsorship = {
   note: string | null;
   created_at: string;
 };
+
+export type ReportTip = { id: string; report_id: string; message: string; contact: string | null; created_at: string };

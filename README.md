@@ -106,3 +106,9 @@ Requiere `supabase/migracion-021-detalle-reservado.sql`.
 - El formulario pide “señas particulares” y, en mascotas encontradas, un detalle reservado (nunca público) para confirmar al dueño.
 - Al publicar un reporte en el panel, `/api/coincidencias` busca posibles coincidencias (distancia, zona y rasgos en común; sin IA) y avisa por Telegram.
 - Kit para compartir de reportes: `/reportes/[id]/kit` (imagen cuadrada con QR y texto; no incluye teléfonos).
+
+## Reportes sin WhatsApp y pie de página
+Requiere `supabase/migracion-022-reportes-sin-whatsapp.sql`.
+- El WhatsApp de quien reporta una mascota es opcional; con foto basta (la descripción es opcional si hay foto).
+- Si un reporte no tiene contacto, su ficha muestra “Tengo información”: el mensaje llega a `report_tips` (se ve en Panel → Reportes) y por Telegram.
+- Pie de página nuevo en `src/components/SiteFooter.tsx`.

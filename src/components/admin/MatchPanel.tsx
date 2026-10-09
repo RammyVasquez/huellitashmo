@@ -114,8 +114,8 @@ export default function MatchPanel({ report, todos, onDone }: { report: AdminRep
                 {enComun(report.description, c.description).length > 0 && ` · En común en la descripción: ${enComun(report.description, c.description).join(", ")}`}
               </small>
               <div>
-                <a href={`https://wa.me/${report.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de este reporte</a>{" · "}
-                <a href={`https://wa.me/${c.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp del candidato</a>
+                {report.contact_whatsapp ? <a href={`https://wa.me/${report.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de este reporte</a> : <span className="muted">Este reporte no dejó contacto</span>}{" · "}
+                {c.contact_whatsapp ? <a href={`https://wa.me/${c.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp del candidato</a> : <span className="muted">El candidato no dejó contacto</span>}
               </div>
             </div>
             <div className="row-actions">

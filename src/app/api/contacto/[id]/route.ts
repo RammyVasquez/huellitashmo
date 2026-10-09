@@ -13,7 +13,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     .in("status", ["activo"])
     .single();
 
-  if (!data) return NextResponse.json({ error: "Reporte no disponible" }, { status: 404 });
+  if (!data || !data.contact_whatsapp) return NextResponse.json({ error: "Este reporte no tiene contacto directo" }, { status: 404 });
 
   const msg =
     data.kind === "perdido"

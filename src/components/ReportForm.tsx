@@ -34,15 +34,31 @@ export default function ReportForm() {
   const [token, setToken] = useState("");
   const [captchaKey, setCaptchaKey] = useState(0);
   const [vuelta, setVuelta] = useState(0);
-  const [enviado, setEnviado] = useState<{ kind: Kind; species: Species; loc: Pos | null; descripcion: string } | null>(null);
+  const [enviado, setEnviado] = useState<{ kind: Kind; species: Species; loc: Pos | null; descripcion: string; sinContacto: boolean } | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const wa = normalizeWa(String(fd.get("whatsapp")));
-    if (!wa || wa.length < 12) {
+    const wa = normalizeWa(String(fd.get("whatsapp") ?? ""));
+    if (wa && wa.length < 12) {
       setEstado("error");
-      setMensaje("Escribe tu WhatsApp con 10 dígitos (ej. 6621234567).");
+      setMensaje("Revisa tu WhatsApp: debe tener 10 dígitos (ej. 6621234567). Si prefieres, déjalo vacío.");
+      return;
+    }
+    const desc = String(fd.get("description") ?? "").trim();
+    if (!desc && files.length === 0) {
+      setEstado("error");
+      setMensaje("Agrega una foto o escribe una descripción del animal.");
+      return;
+    }
+    if (desc && desc.length < 5) {
+      setEstado("error");
+      setMensaje("La descripción es muy corta. Cuéntanos un poco más o déjala en blanco y agrega una foto.");
+      return;
+    }
+    if (!zona.trim()) {
+      setEstado("error");
+      setMensaje("Dinos dónde fue (una calle, una colonia o toca el mapa).");
       return;
     }
     if (CAPTCHA_ACTIVO && !token) {
@@ -60,7 +76,7 @@ export default function ReportForm() {
       body.set("marks", String(fd.get("marks") ?? "").trim());
       if (kind === "encontrado") body.set("private_detail", String(fd.get("private_detail") ?? "").trim());
       body.set("zone", zona.trim());
-      body.set("whatsapp", wa);
+      if (wa) body.set("whatsapp", wa);
       if (loc) { body.set("lat", String(loc.lat)); body.set("lng", String(loc.lng)); }
       body.set("token", token);
       body.set("website", String(fd.get("website") ?? ""));
@@ -70,7 +86,7 @@ export default function ReportForm() {
       const res = await fetch("/api/reportes", { method: "POST", body });
       const out = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(out.error ?? "No pudimos enviar el reporte.");
-      setEnviado({ kind, species, loc, descripcion: `${String(fd.get("description"))} ${String(fd.get("marks") ?? "")}` });
+      setEnviado({ kind, species, loc, descripcion: `${String(fd.get("description"))} ${String(fd.get("marks") ?? "")}`, sinContacto: !wa });
       setEstado("ok");
     } catch (err) {
       console.error(err);
@@ -91,6 +107,7 @@ export default function ReportForm() {
       <div className="form-card success" role="status">
         <h2>¡Gracias por avisar!</h2>
         <p className="lead">Revisaremos tu reporte y lo publicaremos pronto. Mientras tanto, comparte tu caso con tus vecinos y en los grupos de tu colonia.</p>
+        {enviado?.sinContacto && <p className="muted">Como no dejaste un contacto, no podremos avisarte si alguien responde: la información que llegue quedará en el reporte para el equipo.</p>}
         <div className="actions">
           <Link className="btn" href="/reportes">Ver perdidos y encontrados</Link>
           <button className="btn ghost" onClick={reiniciar}>Hacer otro reporte</button>
@@ -111,13 +128,18 @@ export default function ReportForm() {
 
       <section className="fs">
         <h2><span className="num">2</span> Cuéntanos sobre el animal</h2>
+        <p className="muted" style={{ margin: 0 }}>Con una foto basta para empezar. Lo demás ayuda, pero es opcional.</p>
         <div className="choices three" role="radiogroup" aria-label="Tipo de animal">
           <Opcion name="species" activo={species === "perro"} onClick={() => setSpecies("perro")} titulo="Perro" />
           <Opcion name="species" activo={species === "gato"} onClick={() => setSpecies("gato")} titulo="Gato" />
           <Opcion name="species" activo={species === "otro"} onClick={() => setSpecies("otro")} titulo="Otro" />
         </div>
-        <label>Descripción: color, tamaño, edad aproximada y cómo es
-          <textarea name="description" rows={3} maxLength={1000} required placeholder="Ej. Perro mediano, color café claro, como de 3 años, muy amigable" />
+        <div>
+          <b>Fotos <span className="muted" style={{ fontWeight: 400 }}>(hasta {MAX_FOTOS}; de frente, de lado y su seña particular)</span></b>
+          <PhotoPicker key={vuelta} max={MAX_FOTOS} onChange={setFiles} />
+        </div>
+        <label>Descripción <span className="muted" style={{ fontWeight: 400 }}>(opcional si pones foto: color, tamaño, cómo es)</span>
+          <textarea name="description" rows={3} maxLength={1000} placeholder="Ej. Perro mediano, color café claro, como de 3 años, muy amigable" />
         </label>
         <label>Señas particulares <span className="muted" style={{ fontWeight: 400 }}>(lo que más ayuda a reconocerlo)</span>
           <input name="marks" maxLength={400} placeholder="Ej. mancha blanca en la panza, collar rosa con cascabel, cicatriz en la oreja" />
@@ -127,10 +149,6 @@ export default function ReportForm() {
             <input name="private_detail" maxLength={300} placeholder="Algo que solo su dueño sabría, para confirmar que es suyo" />
           </label>
         )}
-        <div>
-          <b>Fotos <span className="muted" style={{ fontWeight: 400 }}>(hasta {MAX_FOTOS}; de frente, de lado y su seña particular)</span></b>
-          <PhotoPicker key={vuelta} max={MAX_FOTOS} onChange={setFiles} />
-        </div>
       </section>
 
       <section className="fs">
@@ -146,11 +164,13 @@ export default function ReportForm() {
       </section>
 
       <section className="fs">
-        <h2><span className="num">4</span> ¿Cómo te contactan?</h2>
+        <h2><span className="num">4</span> ¿Quieres que te contacten? <span className="muted" style={{ fontWeight: 400, fontSize: "1rem" }}>(opcional)</span></h2>
         <label>Tu WhatsApp (10 dígitos)
-          <input name="whatsapp" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="6621234567" required />
+          <input name="whatsapp" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="6621234567" />
         </label>
-        <p className="muted" style={{ margin: 0, fontSize: ".95rem" }}>Tu número nunca se publica: la gente te escribe desde un botón.</p>
+        <p className="muted" style={{ margin: 0, fontSize: ".95rem" }}>
+          Tu número nunca se publica: la gente te escribe desde un botón. {kind === "encontrado" ? "Si solo viste al animal y no lo tienes contigo, puedes dejarlo vacío:" : "Si prefieres no dejarlo,"} el reporte se publica igual y quien tenga información escribirá al equipo de Huellitas HMO.
+        </p>
       </section>
 
       <p className="muted" style={{ margin: 0, fontSize: ".92rem" }}>

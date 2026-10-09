@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import PhotoStrip from "@/components/PhotoStrip";
 import ShareButtons from "@/components/ShareButtons";
+import InformarForm from "@/components/InformarForm";
 import { supabase } from "@/lib/supabase";
 import { fechaCorta } from "@/lib/util";
 import type { PublicReport } from "@/lib/types";
@@ -56,12 +57,13 @@ export default async function FichaReporte({ params }: { params: { id: string } 
           <p className="lead">{r.description}</p>
           {activo && (
             <div className="actions">
-              <a className="btn" href={`/api/contacto/${r.id}`}>{r.kind === "perdido" ? "Vi a esta mascota" : "Es mi mascota"}</a>
+              {r.has_contact !== false && <a className="btn" href={`/api/contacto/${r.id}`}>{r.kind === "perdido" ? "Vi a esta mascota" : "Es mi mascota"}</a>}
               <Link className="btn ghost" href={`/reportes/${r.id}/cartel`}>Imprimir cartel</Link>
               <Link className="btn ghost" href={`/reportes/${r.id}/kit`}>Imagen y texto para compartir</Link>
             </div>
           )}
-          {r.kind === "encontrado" && activo && (
+          {activo && r.has_contact === false && <InformarForm reportId={r.id} perdido={r.kind === "perdido"} />}
+          {r.kind === "encontrado" && activo && r.has_contact !== false && (
             <p className="muted">Por seguridad, quien la encontró te pedirá un detalle que no aparece aquí para confirmar que es tu mascota.</p>
           )}
           <ShareButtons text={titulo(r)} />

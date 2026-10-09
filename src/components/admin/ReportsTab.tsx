@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { coincide } from "@/lib/buscar";
 import { errTexto, fechaCorta } from "@/lib/util";
 import MatchPanel from "./MatchPanel";
-import type { AdminReport } from "@/lib/types";
+import type { AdminReport, ReportTip } from "@/lib/types";
 
 const ESTADOS = ["pendiente", "activo", "reunificado", "cerrado"] as const;
 type Estado = (typeof ESTADOS)[number];
@@ -15,12 +15,15 @@ export default function ReportsTab() {
   const [msg, setMsg] = useState("");
   const [abierto, setAbierto] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState("");
+  const [tips, setTips] = useState<ReportTip[]>([]);
   const [aviso, setAviso] = useState<{ texto: string; enlaces: { id: string; etiqueta: string }[] } | null>(null);
 
   async function load() {
     const { data, error } = await supabase.from("reports").select("id, kind, species, description, photo_url, photos, zone, lat, lng, contact_whatsapp, status, created_at, private_detail").order("created_at", { ascending: false }).limit(300);
     if (error) setMsg(`No se pudieron cargar: ${errTexto(error)}`);
     setItems((data ?? []) as AdminReport[]);
+    const t = await supabase.from("report_tips").select("*").order("created_at", { ascending: false }).limit(500);
+    setTips((t.data ?? []) as ReportTip[]);
   }
   useEffect(() => { load(); }, []);
 
@@ -93,21 +96,31 @@ export default function ReportsTab() {
             <span className="muted"> {r.zone} · {fechaCorta(r.created_at)}</span>
             <p style={{ margin: ".3rem 0" }}>{r.description}</p>
             {r.private_detail && <p style={{ margin: ".3rem 0" }}><b>Detalle reservado</b> <span className="muted">(no se publica; úsalo para confirmar al dueño)</span>: {r.private_detail}</p>}
-            <a href={`https://wa.me/${r.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de quien reportó</a>
+            {r.contact_whatsapp
+              ? <a href={`https://wa.me/${r.contact_whatsapp}`} target="_blank" rel="noopener noreferrer">WhatsApp de quien reportó</a>
+              : <span className="muted">Reportó sin WhatsApp</span>}
             {" · "}
             {r.lat != null && r.lng != null
               ? <a href={`https://www.google.com/maps?q=${r.lat},${r.lng}`} target="_blank" rel="noopener noreferrer">Ver ubicación exacta</a>
               : <span className="muted">Sin ubicación en el mapa</span>}
-            {r.status === "activo" && (
+            {r.status === "activo" && r.contact_whatsapp && (
               <>
                 {" · "}
                 <a
                   href={`https://wa.me/${r.contact_whatsapp}?text=${encodeURIComponent(`Hola, tu reporte ya está publicado en Huellitas HMO. Aquí puedes verlo e imprimir tu cartel: ${typeof window !== "undefined" ? window.location.origin : ""}/reportes/${r.id}/cartel`)}`}
                   target="_blank" rel="noopener noreferrer"
                 >Mandar cartel por WhatsApp</a>
-                {" · "}
-                <a href={`/reportes/${r.id}/kit`} target="_blank" rel="noopener noreferrer">Kit para compartir</a>
+
               </>
+            )}
+            {r.status === "activo" && <>{" · "}<a href={`/reportes/${r.id}/kit`} target="_blank" rel="noopener noreferrer">Kit para compartir</a></>}
+            {tips.filter((t) => t.report_id === r.id).length > 0 && (
+              <details style={{ marginTop: ".4rem" }}>
+                <summary><b>Información recibida ({tips.filter((t) => t.report_id === r.id).length})</b></summary>
+                {tips.filter((t) => t.report_id === r.id).map((t) => (
+                  <p key={t.id} style={{ margin: ".3rem 0" }}>{t.message}<br /><span className="muted">{fechaCorta(t.created_at)}{t.contact ? ` · Contacto: ${t.contact}` : " · Sin contacto"}</span></p>
+                ))}
+              </details>
             )}
           </div>
           <div className="row-actions">

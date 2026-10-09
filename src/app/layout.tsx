@@ -4,6 +4,7 @@ import { Fredoka, Nunito } from "next/font/google";
 import Contacto from "@/components/Contacto";
 import SiteNav from "@/components/SiteNav";
 import VisitaCounter from "@/components/VisitaCounter";
+import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
 
 // Ninguna consulta a la base de datos se guarda en caché en todo el sitio
@@ -57,23 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </div>
         </header>
         <main>{children}</main>
-        <footer className="site">
-          <div className="wrap">
-            <p><b>Huellitas HMO</b> · Proyecto ciudadano de Hermosillo, Sonora.</p>
-            <p>
-              No pedimos dinero: los donativos son en especie y se entregan directo al refugio.
-              ¿Perdiste o encontraste una mascota? <Link href="/reportes/nuevo">Haz un reporte</Link>.
-            </p>
-            <p>
-              <Link href="/adopta">Cómo adoptar</Link> · <Link href="/match">Encuentra tu match</Link> · <Link href="/rescate">Animales heridos o maltratados</Link> · <Link href="/primeros-auxilios">Primeros auxilios</Link>
-            </p>
-            <p>
-              <Link href="/nosotros">Quiénes somos</Link> · <Link href="/historias">Historias</Link> · <Link href="/eventos">Eventos</Link> · <Link href="/impacto">Impacto</Link> · <Link href="/privacidad">Privacidad</Link> · <Link href="/reglas">Reglas de uso</Link>
-              {process.env.NEXT_PUBLIC_CONTACT_EMAIL && <> · <Contacto prefijo="Contacto:" /></>}
-            </p>
-            <p className="footer-admin"><Link href="/admin">Acceso para administradores</Link></p>
-          </div>
-        </footer>
+        <SiteFooter />
       </body>
     </html>
   );
