@@ -115,3 +115,6 @@ Requiere `supabase/migracion-022-reportes-sin-whatsapp.sql`.
 
 ## Zona pública y kit de reportes
 Requiere `supabase/migracion-023-zona-publica.sql`. En los reportes de mascotas encontradas, la zona que se muestra en público es solo la colonia (sin calle, número ni código postal); en las perdidas se quitan números de casa. La imagen y el texto del kit (`/reportes/[id]/kit`) usan el diseño nuevo (`src/lib/kit-reporte-tarjeta.tsx`).
+
+## Kit de animales con el estilo cálido
+La imagen del kit de cada animal usa el mismo diseño que la de los reportes (fondo amarillo, nombre grande, foto inclinada y barra azul con QR). Las piezas comunes están en `src/lib/kit-comun.tsx`.

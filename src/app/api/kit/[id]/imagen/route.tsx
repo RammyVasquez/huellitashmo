@@ -27,7 +27,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   const [foto, qr, fuente] = await Promise.all([
     url ? fotoConMedidas(url) : Promise.resolve(null),
     QRCode.toDataURL(`${sitio}/animales/${a.id}?ref=kit`, { margin: 1, width: 320, errorCorrectionLevel: "M" }).catch(() => null),
-    fuenteGoogle("Fredoka", 600, `${a.name}Huellitas HMO BUSCA HOGAR EN CUIDADOS YA TIENE HOGAR`),
+    fuenteGoogle("Fredoka", 600, `${a.name}Huellitas HMO Busca hogar Se está recuperando ¡Ya tiene hogar!`),
   ]);
 
   const descargar = new URL(req.url).searchParams.get("descargar") === "1";
