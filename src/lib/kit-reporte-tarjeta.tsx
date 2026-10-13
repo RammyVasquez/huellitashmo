@@ -1,5 +1,5 @@
-// Imagen cuadrada (1080x1080) para compartir una mascota perdida o encontrada: cálida, con titular grande y foto protagonista.
-import { Adornos, BarraInferior, DISPLAY, Etiquetas, FONDO, MarcoFoto, NAVY, type FotoKit } from "@/lib/kit-comun";
+// Imagen vertical (1080x1350) para compartir una mascota perdida o encontrada: foto a toda la imagen, titular grande y datos encima.
+import { ALTO, ANCHO, Banner, BarraInferior, DISPLAY, Ficha, FotoCompleta, NAVY, type FotoKit } from "@/lib/kit-comun";
 
 export type DatosReporte = {
   kind: "perdido" | "encontrado";
@@ -10,24 +10,32 @@ export type DatosReporte = {
   qr: string | null;
 };
 
+export function tituloImagen(kind: "perdido" | "encontrado", especie: "perro" | "gato" | "otro") {
+  const nombre = especie === "otro" ? "mascota" : especie;
+  return kind === "perdido" ? (especie === "otro" ? "¿LA HAS VISTO?" : "¿LO HAS VISTO?") : `¿ES TU ${nombre.toUpperCase()}?`;
+}
+
 export function TarjetaReporte({ d }: { d: DatosReporte }) {
   const perdido = d.kind === "perdido";
   const nombre = d.especie === "otro" ? "mascota" : d.especie;
-  const titulo = perdido ? (d.especie === "otro" ? "¿La has visto?" : "¿Lo has visto?") : `¿Es tu ${nombre}?`;
-  const tamTitulo = titulo.length <= 13 ? 128 : titulo.length <= 16 ? 108 : 90;
+  const titulo = tituloImagen(d.kind, d.especie);
   const color = perdido ? "#e0523f" : "#1f9d6b";
   const zona = d.zona.length > 30 ? `${d.zona.slice(0, 29).trim()}…` : d.zona;
-  const etiquetas = [d.especie === "otro" ? "Mascota" : d.especie.charAt(0).toUpperCase() + d.especie.slice(1), `${perdido ? "Desde el" : "Reportado el"} ${d.fecha}`];
+  const especieTxt = d.especie === "otro" ? "Mascota" : d.especie.charAt(0).toUpperCase() + d.especie.slice(1);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", width: 1080, height: 1080, backgroundImage: FONDO, color: NAVY }}>
-      <Adornos />
-      <div style={{ display: "flex", marginTop: 46, fontSize: tamTitulo, lineHeight: 1, ...DISPLAY, color: NAVY }}>{titulo}</div>
-      <div style={{ display: "flex", marginTop: 16, padding: "9px 30px", borderRadius: 44, background: color, color: "#ffffff", fontSize: 36, ...DISPLAY }}>
-        {perdido ? "Se perdió en " : "Se encontró en "}{zona}
+    <div style={{ display: "flex", flexDirection: "column", position: "relative", width: ANCHO, height: ALTO, background: NAVY }}>
+      <FotoCompleta foto={d.foto} />
+      <Banner texto={titulo} color={NAVY} tam={titulo.length <= 14 ? 66 : 54} />
+      <div style={{ display: "flex", justifyContent: "center", width: ANCHO, marginTop: 18 }}>
+        <div style={{ display: "flex", padding: "9px 32px", borderRadius: 44, background: color, color: "#ffffff", fontSize: 38, boxShadow: "0 10px 24px rgba(0,0,0,0.30)", ...DISPLAY }}>
+          {perdido ? "Se perdió en " : "Se encontró en "}{zona}
+        </div>
       </div>
-      <MarcoFoto foto={d.foto} margen={30} />
-      <div style={{ display: "flex", marginTop: 26 }}><Etiquetas lista={etiquetas} /></div>
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", position: "absolute", left: 40, bottom: 204, width: 1000 }}>
+        <div style={{ display: "flex", marginRight: 24 }}><Ficha titulo="ESPECIE" valor={especieTxt} ancho={300} /></div>
+        <Ficha titulo={perdido ? "SE PERDIÓ EL" : "REPORTADO EL"} valor={d.fecha} ancho={380} />
+      </div>
       <BarraInferior cta={perdido ? "Si tienes información, entra aquí" : `Si es tu ${nombre}, entra aquí`} qr={d.qr} />
     </div>
   );

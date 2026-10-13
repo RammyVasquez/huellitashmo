@@ -147,3 +147,18 @@ export function textoKitReporte(r: ReporteKit, url: string, fecha: string): stri
     "#MascotaEncontrada #Hermosillo #HuellitasHMO",
   ].join("\n");
 }
+
+
+// Fichas de la imagen: hasta tres datos cortos del animal
+export function fichasKit(a: Animal): { t: string; v: string }[] {
+  const cap = (x: string) => x.charAt(0).toUpperCase() + x.slice(1);
+  const sexo = a.sex === "hembra" ? "Hembra" : a.sex === "macho" ? "Macho" : null;
+  const estado = a.sterilized ? esteril(a.sex, true) : a.vaccinated ? (a.sex === "hembra" ? "Vacunada" : a.sex === "macho" ? "Vacunado" : "Vacunado/a") : null;
+  const orden: ({ t: string; v: string } | null)[] = [
+    a.age_text ? { t: "EDAD", v: a.age_text } : null,
+    a.size ? { t: "TAMAÑO", v: cap(TAMANO[a.size]) } : null,
+    estado ? { t: "ESTADO", v: estado } : null,
+    sexo ? { t: "SEXO", v: sexo } : null,
+  ];
+  return orden.filter((x): x is { t: string; v: string } => x !== null).slice(0, 3);
+}

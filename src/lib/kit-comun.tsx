@@ -1,9 +1,13 @@
-// Piezas compartidas por las imágenes para compartir (animales en adopción y reportes de mascotas)
+// Piezas compartidas por las imágenes para compartir (animales en adopción y reportes de mascotas).
+// Formato vertical 1080x1350 (4:5): la foto ocupa toda la imagen y los datos van encima.
 export type FotoKit = { uri: string; w: number; h: number };
 
+export const ANCHO = 1080;
+export const ALTO = 1350;
 export const NAVY = "#13284f";
 export const SOL = "#ffc933";
-export const FONDO = "linear-gradient(165deg, #ffe08a 0%, #ffc933 48%, #ffb41f 100%)";
+export const CREMA = "#fff7e0";
+export const DORADO = "#d99a0b";
 export const DISPLAY = { fontFamily: "Fredoka", fontWeight: 600 } as const;
 
 export function Huella({ s, color, left, top, rot = 0 }: { s: number; color: string; left?: number; top?: number; rot?: number }) {
@@ -18,50 +22,51 @@ export function Huella({ s, color, left, top, rot = 0 }: { s: number; color: str
   );
 }
 
-export function Adornos() {
+// La foto cubre toda la imagen; abajo se oscurece un poco para que se lean las fichas y la barra
+export function FotoCompleta({ foto }: { foto: FotoKit | null }) {
   return (
     <>
-      <Huella s={260} color="rgba(19,40,79,0.07)" left={-50} top={620} rot={-18} />
-      <Huella s={200} color="rgba(19,40,79,0.07)" left={880} top={40} rot={20} />
+      <div style={{ display: "flex", position: "absolute", left: 0, top: 0, width: ANCHO, height: ALTO, background: NAVY }}>
+        {foto ? (
+          <img src={foto.uri} width={ANCHO} height={ALTO} style={{ width: ANCHO, height: ALTO, objectFit: "cover", objectPosition: "50% 30%" }} />
+        ) : (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: ANCHO, height: ALTO, backgroundImage: "linear-gradient(160deg, #1d3a73, #13284f)", paddingBottom: 380 }}>
+            <Huella s={340} color={SOL} />
+          </div>
+        )}
+      </div>
+      <div style={{ display: "flex", position: "absolute", left: 0, top: ALTO - 640, width: ANCHO, height: 640, backgroundImage: "linear-gradient(to top, rgba(13,29,61,0.95) 0%, rgba(13,29,61,0.72) 45%, rgba(13,29,61,0) 100%)" }} />
     </>
   );
 }
 
-// Tamaño del marco según la foto: ancha, casi cuadrada o alta
-export function tamanoMarco(foto: FotoKit | null): [number, number] {
-  if (!foto) return [840, 520];
-  const r = foto.w / foto.h;
-  return r >= 1.1 ? [840, 520] : r >= 0.8 ? [640, 540] : [470, 540];
-}
-
-export function MarcoFoto({ foto, margen = 24 }: { foto: FotoKit | null; margen?: number }) {
-  const [fw, fh] = tamanoMarco(foto);
+// Cartel crema de arriba, con huellitas a los lados
+export function Banner({ texto, color = NAVY, tam = 58 }: { texto: string; color?: string; tam?: number }) {
   return (
-    <div style={{ display: "flex", marginTop: margen, width: fw, height: fh, borderRadius: 40, border: "10px solid #ffffff", overflow: "hidden", background: "#ffffff", transform: "rotate(-2deg)", boxShadow: "0 24px 44px rgba(19,40,79,0.30)" }}>
-      {foto ? (
-        <img src={foto.uri} width={fw - 20} height={fh - 20} style={{ width: fw - 20, height: fh - 20, objectFit: "cover", objectPosition: "50% 35%" }} />
-      ) : (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: fw - 20, height: fh - 20, background: "#1d3a73" }}>
-          <Huella s={260} color={SOL} />
-        </div>
-      )}
+    <div style={{ display: "flex", justifyContent: "center", width: ANCHO, marginTop: 44 }}>
+      <div style={{ display: "flex", alignItems: "center", padding: "14px 40px", borderRadius: 42, background: "rgba(255,247,224,0.97)", boxShadow: "0 12px 30px rgba(0,0,0,0.30)" }}>
+        <Huella s={46} color={DORADO} />
+        <div style={{ display: "flex", margin: "0 22px", fontSize: tam, lineHeight: 1.05, color, ...DISPLAY }}>{texto}</div>
+        <Huella s={46} color={DORADO} />
+      </div>
     </div>
   );
 }
 
-export function Etiquetas({ lista }: { lista: string[] }) {
+// Ficha: etiqueta pequeña oscura y valor en caja crema (como un boletín de adopción)
+export function Ficha({ titulo, valor, ancho, tam = 46 }: { titulo: string; valor: string; ancho: number; tam?: number }) {
+  const v = valor.length > 26 ? `${valor.slice(0, 25).trim()}…` : valor;
   return (
-    <div style={{ display: "flex" }}>
-      {lista.map((t) => (
-        <div key={t} style={{ display: "flex", marginLeft: 6, marginRight: 6, padding: "5px 22px", borderRadius: 30, background: NAVY, color: "#ffffff", fontSize: 28 }}>{t}</div>
-      ))}
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: ancho }}>
+      <div style={{ display: "flex", padding: "3px 26px", borderRadius: 20, background: NAVY, color: "#ffffff", fontSize: 24, fontWeight: 700, letterSpacing: 2, border: `2px solid ${CREMA}` }}>{titulo}</div>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", width: ancho, marginTop: 6, padding: "8px 16px", borderRadius: 26, background: CREMA, boxShadow: "0 8px 20px rgba(0,0,0,0.30)", color: NAVY, fontSize: tam, lineHeight: 1.05, textAlign: "center", ...DISPLAY }}>{v}</div>
     </div>
   );
 }
 
 export function BarraInferior({ cta, extra, qr }: { cta: string; extra?: string | null; qr: string | null }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "absolute", left: 0, bottom: 0, width: 1080, height: 176, padding: "0 56px", background: NAVY }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", position: "absolute", left: 0, bottom: 0, width: ANCHO, height: 176, padding: "0 56px", background: NAVY }}>
       <div style={{ display: "flex", flexDirection: "column" }}>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Huella s={34} color={SOL} />

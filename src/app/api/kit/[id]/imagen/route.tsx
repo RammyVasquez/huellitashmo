@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import QRCode from "qrcode";
-import { ctaKit, etiquetasKit, nombreArchivo } from "@/lib/kit";
+import { ctaKit, fichasKit, nombreArchivo } from "@/lib/kit";
+import { textoBanner } from "@/lib/kit-tarjeta";
 import { TarjetaKit } from "@/lib/kit-tarjeta";
 import { fuenteGoogle } from "@/lib/server/fuente";
 import { fotoConMedidas } from "@/lib/server/foto";
@@ -24,18 +25,20 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
   const sitio = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const url = a.photos?.[0] ?? a.photo_url;
+  const datos = fichasKit(a);
+  const estado = a.status === "adoptado" ? "adoptado" : a.status === "en_cuidados" ? "en_cuidados" : "disponible";
   const [foto, qr, fuente] = await Promise.all([
     url ? fotoConMedidas(url) : Promise.resolve(null),
     QRCode.toDataURL(`${sitio}/animales/${a.id}?ref=kit`, { margin: 1, width: 320, errorCorrectionLevel: "M" }).catch(() => null),
-    fuenteGoogle("Fredoka", 600, `${a.name}Huellitas HMO Busca hogar Se está recuperando ¡Ya tiene hogar!`),
+    fuenteGoogle("Fredoka", 600, `${a.name}${datos.map((x) => x.v).join("")}${textoBanner(estado)}Huellitas HMO`),
   ]);
 
   const descargar = new URL(req.url).searchParams.get("descargar") === "1";
   return new ImageResponse(
-    <TarjetaKit d={{ nombre: a.name, foto, etiquetas: etiquetasKit(a), refugio, estado: a.status === "adoptado" ? "adoptado" : a.status === "en_cuidados" ? "en_cuidados" : "disponible", cta: ctaKit(a), qr }} />,
+    <TarjetaKit d={{ nombre: a.name, foto, datos, refugio, estado, cta: ctaKit(a), qr }} />,
     {
       width: 1080,
-      height: 1080,
+      height: 1350,
       fonts: fuente ? [{ name: "Fredoka", data: fuente, weight: 600, style: "normal" }] : undefined,
       headers: {
         "Cache-Control": "public, max-age=300",

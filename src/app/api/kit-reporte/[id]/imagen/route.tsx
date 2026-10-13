@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import QRCode from "qrcode";
 import { zonaPublica } from "@/lib/kit";
-import { TarjetaReporte } from "@/lib/kit-reporte-tarjeta";
+import { TarjetaReporte, tituloImagen } from "@/lib/kit-reporte-tarjeta";
 import { fuenteGoogle } from "@/lib/server/fuente";
 import { fotoConMedidas } from "@/lib/server/foto";
 import { supabase } from "@/lib/supabase";
@@ -25,14 +25,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   const [foto, qr, fuente] = await Promise.all([
     url ? fotoConMedidas(url) : Promise.resolve(null),
     QRCode.toDataURL(enlace, { margin: 1, width: 320, errorCorrectionLevel: "M" }).catch(() => null),
-    fuenteGoogle("Fredoka", 600, `¿Es tu perro gato mascota? Lo La has visto Se perdió encontró en Huellitas HMO ${zona}`),
+    fuenteGoogle("Fredoka", 600, `${tituloImagen(r.kind, r.species)}Se perdió encontró en Huellitas HMO Perro Gato Mascota ${zona} ${corta(r.created_at)}`),
   ]);
 
   const descargar = new URL(req.url).searchParams.get("descargar") === "1";
   return new ImageResponse(
     <TarjetaReporte d={{ kind: r.kind, especie: r.species, foto, zona, fecha: corta(r.created_at), qr }} />,
     {
-      width: 1080, height: 1080,
+      width: 1080, height: 1350,
       fonts: fuente ? [{ name: "Fredoka", data: fuente, weight: 600, style: "normal" }] : undefined,
       headers: { "Cache-Control": "public, max-age=300", ...(descargar ? { "Content-Disposition": `attachment; filename="${r.kind}-${r.id.slice(0, 8)}.png"` } : {}) },
     }

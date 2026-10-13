@@ -29,7 +29,7 @@ export default function KitCompartir({ id, nombre, textoInicial, archivo, imagen
   return (
     <div className="kit">
       <div>
-        <img className="kit-img" src={imagen} alt={`Imagen para compartir a ${nombre}`} width={540} height={540} />
+        <img className="kit-img" src={imagen} alt={`Imagen para compartir a ${nombre}`} width={540} height={675} />
         <div className="actions">
           <a className="btn" href={`${imagen}?descargar=1`} download={`${archivo}.png`}>Descargar imagen</a>
           {typeof navigator !== "undefined" && "share" in navigator && <button className="btn ghost" onClick={compartir}>Compartir</button>}

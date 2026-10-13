@@ -124,3 +124,6 @@ Panel → Reportes → “Editar”: permite cambiar tipo, especie, descripción
 
 ## Ver todas las adopciones
 Panel → Adopciones → “Todas las adopciones” lista todos los animales adoptados, con familia registrada o sin solicitud (marcados con el botón rápido de Animales), y cuántos seguimientos tienen. Panel → Animales ahora tiene filtros por estado, y el botón “Marcar adoptado” avisa que no programa seguimientos.
+
+## Kit con la foto a toda la imagen
+Las imágenes para compartir (animales y reportes) ahora son verticales (1080x1350, formato 4:5): la foto ocupa toda la imagen y encima van el cartel de arriba, las fichas (nombre, edad, tamaño, estado) y la barra inferior con el QR. Piezas en `src/lib/kit-comun.tsx`; las fichas de cada animal salen de `fichasKit()` en `src/lib/kit.ts`.

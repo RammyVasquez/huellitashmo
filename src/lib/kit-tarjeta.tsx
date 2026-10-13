@@ -1,36 +1,42 @@
-// Imagen cuadrada (1080x1080) para compartir a un animal en adopción: cálida, con su nombre grande y su foto como protagonista.
-import { Adornos, BarraInferior, DISPLAY, Etiquetas, FONDO, MarcoFoto, NAVY, type FotoKit } from "@/lib/kit-comun";
+// Imagen vertical (1080x1350) para compartir a un animal en adopción: su foto ocupa toda la imagen y los datos van encima, como un boletín de adopción.
+import { ALTO, ANCHO, Banner, BarraInferior, DISPLAY, FotoCompleta, Ficha, NAVY, type FotoKit } from "@/lib/kit-comun";
 
 export type { FotoKit };
 export type DatosKit = {
   nombre: string;
   foto: FotoKit | null;
-  etiquetas: string[];
+  datos: { t: string; v: string }[];   // hasta 3 fichas: EDAD, TAMAÑO, ESTADO...
   refugio: string | null;
   estado: "disponible" | "en_cuidados" | "adoptado";
   cta: string;           // ej. "Adóptala"
   qr: string | null;     // data URI del código QR hacia la ficha
 };
 
-function Pastilla({ estado }: { estado: DatosKit["estado"] }) {
-  const fondo = estado === "adoptado" ? "#1f9d6b" : estado === "en_cuidados" ? "#3f7de0" : NAVY;
-  const texto = estado === "adoptado" ? "¡Ya tiene hogar!" : estado === "en_cuidados" ? "Se está recuperando" : "Busca hogar";
-  return <div style={{ display: "flex", padding: "8px 32px", borderRadius: 44, background: fondo, color: "#ffffff", fontSize: 34, ...DISPLAY }}>{texto}</div>;
+export function textoBanner(estado: DatosKit["estado"]) {
+  return estado === "adoptado" ? "¡YA TIENE HOGAR!" : estado === "en_cuidados" ? "SE ESTÁ RECUPERANDO" : "BUSCA HOGAR";
 }
 
-function tamNombre(nombre: string) {
-  return Math.max(56, Math.min(140, Math.floor(968 / (Math.max(nombre.length, 1) * 0.62))));
+function tamNombre(n: string) {
+  return n.length <= 7 ? 74 : n.length <= 11 ? 60 : n.length <= 16 ? 48 : 38;
 }
 
 export function TarjetaKit({ d }: { d: DatosKit }) {
-  const nombre = d.nombre.length > 30 ? `${d.nombre.slice(0, 29).trim()}…` : d.nombre;
+  const nombre = d.nombre.length > 24 ? `${d.nombre.slice(0, 23).trim()}…` : d.nombre;
+  const color = d.estado === "adoptado" ? "#1f9d6b" : d.estado === "en_cuidados" ? "#2f68c9" : NAVY;
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", position: "relative", width: 1080, height: 1080, backgroundImage: FONDO, color: NAVY }}>
-      <Adornos />
-      <div style={{ display: "flex", marginTop: 36 }}><Pastilla estado={d.estado} /></div>
-      <div style={{ display: "flex", marginTop: 10, fontSize: tamNombre(nombre), lineHeight: 1, ...DISPLAY, color: NAVY }}>{nombre}</div>
-      <MarcoFoto foto={d.foto} margen={24} />
-      <div style={{ display: "flex", marginTop: 24 }}><Etiquetas lista={d.etiquetas.slice(0, 4)} /></div>
+    <div style={{ display: "flex", flexDirection: "column", position: "relative", width: ANCHO, height: ALTO, background: NAVY }}>
+      <FotoCompleta foto={d.foto} />
+      <Banner texto={textoBanner(d.estado)} color={color} tam={d.estado === "en_cuidados" ? 50 : 58} />
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", position: "absolute", left: 40, bottom: 204, width: 1000 }}>
+        <Ficha titulo="NOMBRE" valor={nombre} ancho={500} tam={tamNombre(nombre)} />
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          {d.datos.slice(0, 3).map((x, i) => (
+            <div key={x.t} style={{ display: "flex", marginTop: i === 0 ? 0 : 14 }}>
+              <Ficha titulo={x.t} valor={x.v} ancho={440} tam={x.v.length > 14 ? 34 : 42} />
+            </div>
+          ))}
+        </div>
+      </div>
       <BarraInferior cta={d.cta} extra={d.refugio} qr={d.qr} />
     </div>
   );
