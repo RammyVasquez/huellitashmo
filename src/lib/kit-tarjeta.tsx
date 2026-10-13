@@ -6,7 +6,6 @@ export type DatosKit = {
   nombre: string;
   foto: FotoKit | null;
   datos: { t: string; v: string }[];   // hasta 3 fichas: EDAD, TAMAÑO, ESTADO...
-  refugio: string | null;
   estado: "disponible" | "en_cuidados" | "adoptado";
   cta: string;           // ej. "Adóptala"
   qr: string | null;     // data URI del código QR hacia la ficha
@@ -37,7 +36,7 @@ export function TarjetaKit({ d }: { d: DatosKit }) {
           ))}
         </div>
       </div>
-      <BarraInferior cta={d.cta} extra={d.refugio} qr={d.qr} />
+      <BarraInferior cta={d.cta} qr={d.qr} />
     </div>
   );
 }

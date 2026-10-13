@@ -18,11 +18,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   const a = data as Animal | null;
   if (!a) return new Response("No encontrado", { status: 404 });
 
-  let refugio: string | null = null;
-  if (a.shelter_id) {
-    const { data: sh } = await supabase.from("shelters").select("name").eq("id", a.shelter_id).maybeSingle();
-    refugio = sh?.name ?? null;
-  }
   const sitio = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
   const url = a.photos?.[0] ?? a.photo_url;
   const datos = fichasKit(a);
@@ -35,7 +30,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
 
   const descargar = new URL(req.url).searchParams.get("descargar") === "1";
   return new ImageResponse(
-    <TarjetaKit d={{ nombre: a.name, foto, datos, refugio, estado, cta: ctaKit(a), qr }} />,
+    <TarjetaKit d={{ nombre: a.name, foto, datos, estado, cta: ctaKit(a), qr }} />,
     {
       width: 1080,
       height: 1350,
