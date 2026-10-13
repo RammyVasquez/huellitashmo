@@ -6,18 +6,21 @@ import { ABIERTAS, ADAPTACION, alertas, ESTADOS_SOLICITUD, ETIQUETA_ESTADO, resu
 import type { AdoptionRequest, Followup } from "@/lib/types";
 import { useShelters } from "./useShelters";
 
-type Grupo = "nuevas" | "proceso" | "adoptadas" | "cerradas";
+type Grupo = "nuevas" | "proceso" | "adoptadas" | "cerradas" | "todas";
+type AnimalAdoptado = { id: string; name: string; species: string; photo_url: string | null; shelter_id: string | null; adopted_at: string | null };
 const GRUPOS: Record<Grupo, { nombre: string; estados: EstadoSolicitud[] }> = {
   nuevas: { nombre: "Nuevas", estados: ["nueva"] },
   proceso: { nombre: "En proceso", estados: ["contactado", "entrevista", "visita", "aprobada"] },
   adoptadas: { nombre: "Adoptadas", estados: ["adoptado"] },
   cerradas: { nombre: "Cerradas", estados: ["rechazada", "cancelada"] },
+  todas: { nombre: "Todas las adopciones", estados: [] },
 };
 
 export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
   const { shelters } = useShelters();
   const [items, setItems] = useState<AdoptionRequest[]>([]);
   const [seguimientos, setSeguimientos] = useState<Followup[]>([]);
+  const [adoptados, setAdoptados] = useState<AnimalAdoptado[]>([]);
   const [grupo, setGrupo] = useState<Grupo>("nuevas");
   const [msg, setMsg] = useState("");
 
@@ -30,6 +33,10 @@ export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
     const f = await supabase.from("adoption_followups")
       .select("*, adoption_requests(applicant_name, whatsapp, animals(name))").order("due_date").limit(500);
     setSeguimientos((f.data ?? []) as unknown as Followup[]);
+    // Todos los animales adoptados, aunque se hayan marcado sin solicitud
+    const ad = await supabase.from("animals").select("id, name, species, photo_url, shelter_id, adopted_at").eq("status", "adoptado")
+      .order("adopted_at", { ascending: false, nullsFirst: false }).limit(500);
+    setAdoptados((ad.data ?? []) as AnimalAdoptado[]);
   }, []);
   useEffect(() => { load(); }, [load]);
 
@@ -88,7 +95,9 @@ export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
     if (error) setMsg(errTexto(error)); else load();
   }
 
-  const cuenta = (g: Grupo) => items.filter((r) => GRUPOS[g].estados.includes(r.status)).length;
+  const cuenta = (g: Grupo) => (g === "todas" ? adoptados.length : items.filter((r) => GRUPOS[g].estados.includes(r.status)).length);
+  const solicitudAdoptada = (animalId: string) => items.find((r) => r.animal_id === animalId && r.status === "adoptado");
+  const sinSolicitud = adoptados.filter((a) => !solicitudAdoptada(a.id)).length;
   const lista = items.filter((r) => GRUPOS[grupo].estados.includes(r.status));
   const hoy = new Date().toISOString().slice(0, 10);
   const porEnviar = seguimientos.filter((f) => f.status === "pendiente" && f.due_date <= hoy);
@@ -127,7 +136,37 @@ export default function AdoptionsTab({ rol = "admin" }: { rol?: string } = {}) {
         ))}
       </div>
 
-      {lista.length === 0 && <div className="empty">No hay solicitudes en “{GRUPOS[grupo].nombre.toLowerCase()}”.</div>}
+      {grupo === "todas" && (
+        <>
+          <p className="muted" style={{ maxWidth: "70ch" }}>
+            {adoptados.length} {adoptados.length === 1 ? "animal adoptado" : "animales adoptados"} · {adoptados.length - sinSolicitud} con familia registrada ·{" "}
+            <b>{sinSolicitud} sin solicitud</b> (no tienen datos de la familia ni seguimientos). Todos cuentan en la cifra de Impacto.
+          </p>
+          {adoptados.length === 0 && <div className="empty">Aún no hay animales adoptados.</div>}
+          {adoptados.map((a) => {
+            const r = solicitudAdoptada(a.id);
+            const sh = shelters.find((s) => s.id === a.shelter_id);
+            const segs = r ? seguimientos.filter((f) => f.request_id === r.id) : [];
+            const respondidos = segs.filter((f) => f.status === "respondido").length;
+            return (
+              <div className="admin-row" key={a.id}>
+                {a.photo_url ? <img className="thumb" src={a.photo_url} alt="" /> : <div className="thumb" />}
+                <div className="grow">
+                  <b>{a.name}</b> <span className="tag">{a.species}</span>
+                  {r ? <span className="tag ok">con familia registrada</span> : <span className="tag alerta">sin solicitud</span>}
+                  <div className="muted">{sh?.name ?? "Sin refugio"} · adoptado {a.adopted_at ? fechaCorta(a.adopted_at) : "(sin fecha)"}{r ? ` · familia: ${r.applicant_name}` : ""}</div>
+                  <div className="muted">
+                    {r
+                      ? `Seguimientos: ${respondidos} respondidos de ${segs.length}`
+                      : "Se marcó con el botón rápido de la pestaña Animales o se adoptó fuera de la plataforma: no hay datos de la familia ni seguimientos."}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </>
+      )}
+      {grupo !== "todas" && lista.length === 0 && <div className="empty">No hay solicitudes en “{GRUPOS[grupo].nombre.toLowerCase()}”.</div>}
       {lista.map((r) => {
         const sh = refugioDe(r);
         const av = alertas(r);

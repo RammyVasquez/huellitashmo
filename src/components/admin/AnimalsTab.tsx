@@ -15,6 +15,7 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
   const { shelters, cargando } = useShelters();
   const visibles = shelterId ? shelters.filter((s) => s.id === shelterId) : shelters;
   const [animals, setAnimals] = useState<Animal[]>([]);
+  const [filtro, setFiltro] = useState<"todos" | Animal["status"]>("todos");
   const [editing, setEditing] = useState<Animal | null>(null);
   const [formKey, setFormKey] = useState(0);
   const [fotos, setFotos] = useState<string[]>([]);   // fotos que ya tiene (se pueden quitar o cambiar de orden)
@@ -82,11 +83,13 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
   }
 
   async function marcarAdoptado(a: Animal) {
+    if (!confirm(`Vas a marcar a ${a.name} como adoptado SIN registrar a la familia: no se programarán seguimientos.\n\nSi la adopción vino de una solicitud, hazla desde la pestaña Adopciones.\n\n¿Continuar de todos modos?`)) return;
     const { error } = await supabase.from("animals").update({ status: "adoptado", adopted_at: new Date().toISOString() }).eq("id", a.id);
     if (error) setMsg({ ok: false, text: errTexto(error) });
     else load();
   }
 
+  const lista = filtro === "todos" ? animals : animals.filter((a) => a.status === filtro);
   if (!cargando && visibles.length === 0)
     return <div className="empty">Primero registra un refugio en la pestaña “Refugios”.</div>;
 
@@ -192,8 +195,16 @@ export default function AnimalsTab({ shelterId }: { shelterId?: string } = {}) {
       </form>
 
       <h2 style={{ marginTop: "2.5rem" }}>Animales registrados ({animals.length})</h2>
+      <div className="chips" role="group" aria-label="Filtrar por estado">
+        {([["todos", "Todos"], ["disponible", "Disponibles"], ["en_proceso", "En proceso"], ["en_cuidados", "En cuidados"], ["adoptado", "Adoptados"]] as const).map(([k, n]) => (
+          <a key={k} href="#" aria-current={filtro === k} onClick={(e) => { e.preventDefault(); setFiltro(k); }}>
+            {n} ({k === "todos" ? animals.length : animals.filter((a) => a.status === k).length})
+          </a>
+        ))}
+      </div>
       {animals.length === 0 && <div className="empty">Aún no hay animales.</div>}
-      {animals.map((a) => (
+      {animals.length > 0 && lista.length === 0 && <div className="empty">No hay animales con este estado.</div>}
+      {lista.map((a) => (
         <div className="admin-row" key={a.id}>
           {a.photo_url ? <img className="thumb" src={a.photo_url} alt="" /> : <div className="thumb" />}
           <div className="grow">

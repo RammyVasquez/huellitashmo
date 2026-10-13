@@ -121,3 +121,6 @@ La imagen del kit de cada animal usa el mismo diseño que la de los reportes (fo
 
 ## Editar reportes desde el panel
 Panel → Reportes → “Editar”: permite cambiar tipo, especie, descripción, zona y mapa, detalle reservado, WhatsApp y las fotos (agregar, quitar, elegir la principal; hasta 8). Si cambian las fotos, se borran sus huellas visuales para recalcularlas. Requiere `supabase/migracion-024-moderador-fotos.sql` para que los moderadores también suban fotos.
+
+## Ver todas las adopciones
+Panel → Adopciones → “Todas las adopciones” lista todos los animales adoptados, con familia registrada o sin solicitud (marcados con el botón rápido de Animales), y cuántos seguimientos tienen. Panel → Animales ahora tiene filtros por estado, y el botón “Marcar adoptado” avisa que no programa seguimientos.
